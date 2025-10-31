@@ -1,176 +1,153 @@
-# Mi Dinero Crece
+# MiDineroCrece v5
 
-**Objetivo:** una app web para **gestionar** datasets de CSAT (CSV/JSON) y **visualizarlos** sin depender de Excel. Permite **cargar, etiquetar y priorizar** comentarios; persistir **KPIs**; y construir visualizaciones.
+**MiDineroCrece** es una SPA (Vite + React + TypeScript) para explorar y visualizar información financiera con enfoque en usabilidad, medición y navegación por **vistas** desde un **nav lateral**.  
+Esta versión mantiene la **misma arquitectura** validada en iteraciones anteriores y respeta los **estilos existentes** del proyecto.
 
----
-
-## ✨ Qué hace
-
-- **Importar datasets** `.csv`/`.json` (comentarios de clientes segmentados x Renta. Fuente CSAT).
-  - CSV con **separador `;`** y encabezados.
-- **Edición en lote**: _Driver_, _Dolor_, _Recurrencia_, _Criticidad_, _Factibilidad_, _Estado_.
-- **Drivers** como **agrupadores** de comentarios (texto libre asistido por datalist); se sugieren a partir de:  
-  `driver_detractor`, `driver_neutro`, `driver_promotor` (si existen en el dataset).
-- **Prioridad (RxC)** se **calcula automáticamente** como matriz **Recurrencia × Criticidad** (no editable).
-- **Sankey** (peso = **count de filas**) con flujo:  
-  **Driver → Prioridad → Factibilidad → Proyectos → Estado**.
-- **KPIs** (editable in place, con negativos): _CSAT Canal_, _CSAT Inversiones_, _Comentarios CSAT_.  
-  Persisten en **IndexedDB**.
+> 🗺️ Índice rápido de archivos (fuente de verdad): `rawfiles.md`  
+> 📐 Mockup visual de referencia (no runtime): `__overview_mockup.html`
 
 ---
 
-## 🧱 Arquitectura & Capas
+## Tabla de contenidos
+
+- [Stack](#stack)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Scripts](#scripts)
+- [Inicio rápido](#inicio-rápido)
+- [Datos y almacenamiento](#datos-y-almacenamiento)
+- [Navegación por vistas](#navegación-por-vistas)
+- [Estilos](#estilos)
+- [Guías de desarrollo](#guías-de-desarrollo)
+- [Métricas operativas (opcional)](#métricas-operativas-opcional)
+- [Troubleshooting](#troubleshooting)
+- [Créditos y licencias](#créditos-y-licencias)
+
+---
+
+## Stack
+
+- **Vite** (dev server & build)
+- **React 18** + **TypeScript**
+- **IndexedDB (Dexie)** para persistencia local
+- **UI components** (wrappers en `src/components/ui/*`)
+- **Sin nuevas hojas de estilo**: se utilizan las ya incluidas en el proyecto
+
+---
+
+## Estructura del proyecto
 
 ```
-src/
-  App.tsx                      # Layout
-  styles/variables.css         # Design tokens + UI base (cards, tabs, tabla, etc.)
-  models/types.ts              # Tipos del dominio (Row, Dataset, estados, niveles)
-  constants/catalogs.ts        # Matriz RxC (Reglas de prioridad)
-  services/
-    files.ts                   # Carga y parseo CSV (Papaparse)
-    storage.ts                 # Dexie (IndexedDB) p/ datasets + KPIs
-  stores/
-    datasets.ts                # Estado y mutaciones de datasets (Zustand + Immer)
-    kpis.ts                    # Estado/persistencia de KPIs
-  features/
-    table/Table.tsx            # Tabla (bulk edit, select-all, datalist)
-    viz/Sankey.tsx             # Sankey ECharts
-  viz/
-    theme.ts                   # Registro de theme ECharts
-  ui/
-    KPIBoard.tsx               # KPI cards editables
-    Breadcrumbs.tsx            # Migas simples
+Root
+├─ __overview_mockup.html        # Mockup estático (referencia visual, no participa del runtime)
+├─ index.html                    # Entry de Vite (mount point)
+├─ package.json / package-lock.json
+├─ tsconfig.json / tsconfig.app.json / tsconfig.node.json
+├─ uploads/                      # Fixtures de datos (ver “Datos y almacenamiento”)
+│  ├─ sat_dataset_2.csv          # CSV con separador ';'
+│  └─ proyectos.json             # Payload de ejemplo para listas de proyectos
+└─ src/
+   ├─ main.tsx                   # Bootstrap React (ReactDOM.createRoot)
+   ├─ App.tsx                    # App shell + routing de vistas
+   ├─ index.css                  # Import base
+   ├─ styles/globals.css         # Tokens/utilidades del diseño del proyecto
+   │
+   ├─ data/storage.ts            # Dexie schema + helpers (save/load)
+   │
+   ├─ imports/
+   │  ├─ Container.tsx           # Wrapper/flujo de importación
+   │  └─ svg-*.ts                # Asset SVG embebido como módulo TS
+   │
+   ├─ components/
+   │  ├─ figma/ImageWithFallback.tsx
+   │  └─ ui/                     # Primitivas UI (wrappers tipo Radix/shadcn)
+   │     ├─ button.tsx, input.tsx, table.tsx, dialog.tsx, drawer.tsx, …
+   │     ├─ navigation-menu.tsx, pagination.tsx, tabs.tsx, tooltip.tsx, …
+   │     └─ utils.ts, use-mobile.ts
+   │
+   └─ guidelines/Guidelines.md   # Pautas de desarrollo/UX del proyecto
 ```
 
-**Patrón:** “Feature-first” para vistas (`features/*`), con **capas claras**:
-
-- `/services`: I/O (parseo de archivos, persistencia).
-- `/models`: tipos de dominio (TS).
-- `/stores`: **estado global** con **Zustand** (mutaciones con **Immer**).
-- `/viz`: tema y utilidades de gráficos.
+> Para descripciones y enlaces raw de cada archivo, ver **`rawfiles.md`** (inventario mantenido en el repo).
 
 ---
 
-## 🧩 Librerías clave
-
-- **React 18 + TypeScript + Vite** (rápido en StackBlitz).
-- **Zustand** (estado) + **Immer** (mutaciones inmutables legibles).
-- **Dexie** (IndexedDB) para persistir **datasets** y **KPIs** en el navegador.
-- **PapaParse** para CSV con `;`.
-- **ECharts + echarts-for-react** para el **Sankey** con tema personalizado.
-- **Inter** desde Google Fonts.
-
-> _No se incluyen por ahora_ tests, MSW, logger ni code-splitting: priorizamos edición/visualización rápida y uso en StackBlitz/iOS.
-
----
-
-## 🗂️ Modelo de Datos (resumen)
-
-```ts
-type WfLevel = 'Baja' | 'Media' | 'Alta' | 'Sin asignar';
-type Estado =
-  | 'En Backlog de tribu' | 'En desarrollo' | 'Se hizo Diagrama de flujo'
-  | 'Se hizo EQC' | 'En producción' | 'Descartado' | 'Sin asignar';
-
-interface Row {
-  id: string;
-  src: Record<string, unknown>;   // columnas originales del CSV/JSON (incluye comentario)
-  driver?: string;                // agrupador editable (datalist + input libre)
-  workflow: {};
-}
-
-interface Dataset {
-  id: string; name: string; rows: Row[];
-  createdAt: number; updatedAt: number;
-}
-```
-
-### Reglas importantes
-
-- **RxC (Prioridad)** = matriz **Recurrencia × Criticidad** (no editable).
-- Si falta algún valor de los 5 campos, se agrupa como **“Sin asignar”** en esa etapa.
-- **Sankey** NO se filtra por `banca`, `segmento_cx` o `año`; esos campos se reservan para futuras visualizaciones.
-- **Valor del Sankey**: **conteo** de filas por enlace.
-- **Drivers**: un solo driver por fila (bulk edit disponible).
-
----
-
-## 🎨 Visual & UX
-
-- **Inter** en toda la UI.
-- **Design tokens** (`variables.css`):
-  - **Tabla** con zebra + hover, checkbox **select-all** en `<th>`.
-- **KPI cards**: valor XL; acepta **negativos**; color: **verde ≥ 0**, **rojo < 0**.
-- **Sankey**:
-  - **Gradiente por link** (de color del **source** al **target**).
-  - `nodeWidth` y `nodeGap` afinados; labels 12px/600.
-
----
-
-## 🚀 Puesta en marcha
-
-### StackBlitz (recomendado / iOS friendly)
-
-1. Importá el repo o soltá la carpeta.
-2. Verás el preview al guardar; botón **Importar CSV/JSON** para cargar datasets.
-
-### Local (opcional)
+## Scripts
 
 ```bash
-pnpm i    # o npm i / yarn
-pnpm dev  # abre http://localhost:5173
-```
+# Instalar dependencias
+npm install
 
-> **Permisos admin no requeridos**. Todo corre en el navegador y persiste en IndexedDB.
+# Entorno de desarrollo
+npm run dev
 
----
+# Build de producción
+npm run build
 
-## 🔒 Persistencia
-
-- **Datasets**: se guardan íntegros en IndexedDB (`Dexie`).
-- **KPIs**: tabla independiente (`singleton`) con `csatCanal`, `csatInversiones`, `comentarios`.
-- **Reset**: limpiar _Application → IndexedDB_ en herramientas del navegador.
-
----
-
-## 🛠️ Convenciones & Calidad
-
-- **TypeScript estricto**.
-- Estructura “feature-first” para escalar vistas.
-- En stores, cada mutación actualiza `updatedAt` del dataset.
-- **Datalist** para drivers (evita duplicados típicos), pero **permite libre edición** y **borrar** correctamente.
-
----
-
-## 📎 Notas sobre el CSV
-
-- Separador: **`;`**.
-- Columnas especiales (opcionales):  
-  `driver_detractor`, `driver_neutro`, `driver_promotor` → se usan para **pre-cargar** `driver`.
-- Campo de texto de comentario: se muestra completo con _title_ y se puede truncar a 3 líneas (opcional CSS).
-
----
-
-## ⚙️ Scripts
-
-```json
-"scripts": {
-  "dev": "vite",
-  "build": "tsc -b && vite build",
-  "preview": "vite preview"
-}
+# Preview del build (servidor estático local)
+npm run preview
 ```
 
 ---
 
-## 📦 Stack
+## Inicio rápido
 
-- **React 18**, **TypeScript 5**, **Vite 5**
-- **Zustand 4**, **Immer 10**
-- **Dexie 4** (IndexedDB)
-- **ECharts 5** + **echarts-for-react**
-- **PapaParse 5**
-- **Inter** (Google Fonts)
+1. **Instalá dependencias**: `npm install`.  
+2. **Levantá el entorno**: `npm run dev` y abrí la URL que muestre Vite (ej: `http://localhost:5173`).  
+3. **Explorá vistas** desde el **nav izquierdo**.  
+4. (Opcional) **Cargá fixtures** desde `uploads/` para probar flujos de importación y persistencia.
 
 ---
+
+## Datos y almacenamiento
+
+La app usa **IndexedDB** mediante **Dexie**. Los helpers viven en `src/data/storage.ts`:
+
+- `saveDataset(data: YourType[])`
+- `loadDataset(): Promise<YourType[]>`
+- `saveProjects(data: Project[])`
+- `loadProjects(): Promise<Project[]>`
+
+**Fixtures de prueba:**
+
+- `uploads/sat_dataset_2.csv` → **Separador `;` (punto y coma)**  
+- `uploads/proyectos.json`
+
+> Recomendación: tratá `uploads/` como **fuente canónica de pruebas**. Si necesitás reseed, documentá el cambio en `rawfiles.md`.
+
+---
+
+## Navegación por vistas
+
+- v5 adopta navegación **“por vistas”** desde el **nav izquierdo**.  
+- El shell en `src/App.tsx` organiza layout y rutas.  
+- Los componentes en `src/components/ui/*` proveen menús, drawers, resizable panels, tabs y otros primitivos para construir la navegación.
+
+---
+
+## Estilos
+
+- **No se agregan nuevas hojas de estilo**.  
+- Se reutilizan `src/index.css` y `src/styles/globals.css` (tokens/variables/utilidades).  
+- Los componentes UI ya incluyen las clases/utilidades necesarias.
+
+---
+
+## Guías de desarrollo
+
+- Consultá `src/guidelines/Guidelines.md` para convenciones de UX/desarrollo.  
+- Para conocer propósito y enlaces raw de cada archivo, usá `rawfiles.md` (índice auto-mantenido).
+
+---
+
+## Troubleshooting
+
+- **CSV**: recordá que los CSV usan **`;`** como separador (no `,`).  
+- **Estilos**: si algo “no se ve”, confirmá que los imports de `index.css`/`styles/globals.css` estén presentes en el entry.  
+- **IndexedDB**: al cambiar el schema, incrementá la versión de Dexie en `storage.ts` y definí migraciones si hiciera falta.
+
+---
+
+## Créditos y licencias
+
+- Ver **`Attributions.md`** para licencias de assets.  
+- Este repositorio incluye recomendaciones de entorno en `.vscode/extensions.json` para alinear el tooling del equipo.
