@@ -1,4 +1,4 @@
-# Mi Dinero Crece v3
+# Mi Dinero Crece
 
 **Objetivo:** una app web para **gestionar** datasets de CSAT (CSV/JSON) y **visualizarlos** sin depender de Excel. Permite **cargar, etiquetar y priorizar** comentarios; persistir **KPIs**; y construir visualizaciones.
 
