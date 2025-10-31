@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mi Dinero Crece (Maqueta)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b1020;
+        --panel: #101830;
+        --panel-2: #0f1a38;
+        --text: #e7ecff;
+        --muted: #a9b4d0;
+        --accent: #7aa2ff;
+        --ok: #2ecc71;
+        --warn: #ffcc00;
+        --bad: #ff5c7c;
+        --outline: #224;
+        --chip: #12224a;
+        --card-radius: 14px;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto,
+          Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+        color: var(--text);
+        background: linear-gradient(180deg, #0a0f1f 0%, #0d1230 100%);
+      }
+      .app {
+        display: grid;
+        grid-template-columns: 64px 1fr;
+        gap: 16px;
+        height: 100vh;
+        padding: 16px;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        background: var(--panel);
+        border: 1px solid var(--outline);
+        border-radius: 20px;
+        padding: 12px 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        box-shadow: var(--shadow);
+      }
+      .side-btn {
+        width: 40px;
+        height: 40px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        color: var(--muted);
+        background: transparent;
+        border: 1px solid transparent;
+        cursor: pointer;
+      }
+      .side-btn:hover {
+        background: #0e1b3b;
+        border-color: #1d2a5b;
+        color: #cfe0ff;
+      }
+      .side-btn.active {
+        background: #12224a;
+        border-color: #27407e;
+        color: #fff;
+      }
+
+      /* Main */
+      .main {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 16px;
+      }
+
+      /* Top bar */
+      .topbar {
+        background: var(--panel);
+        border: 1px solid var(--outline);
+        border-radius: 20px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        justify-content: space-between;
+        box-shadow: var(--shadow);
+      }
+      .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #7aa2ff, #6ef3ff);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        color: #0b1020;
+      }
+      .title {
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .btn {
+        appearance: none;
+        border: 1px solid #29407c;
+        background: #12224a;
+        color: #e9f1ff;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .btn:hover {
+        background: #172c60;
+      }
+      .chip {
+        border: 1px solid #2d4a95;
+        background: var(--chip);
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: #cfe0ff;
+        font-size: 0.85rem;
+      }
+
+      /* Content grid */
+      .content {
+        display: grid;
+        grid-template-columns: 1.6fr 0.8fr;
+        gap: 16px;
+        height: 100%;
+      }
+
+      /* Left column */
+      .stack {
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 16px;
+      }
+
+      /* KPI row */
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--outline);
+        border-radius: var(--card-radius);
+        padding: 16px;
+        box-shadow: var(--shadow);
+      }
+      .kpi .label {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .kpi .value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-top: 6px;
+      }
+      .kpi .value.bad {
+        color: var(--bad);
+      }
+      .kpi .value.ok {
+        color: var(--ok);
+      }
+
+      /* Segmented bars */
+      .block-title {
+        font-weight: 700;
+        margin-bottom: 10px;
+        letter-spacing: 0.2px;
+      }
+      .segmented {
+        display: grid;
+        gap: 14px;
+      }
+      .bar-row {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        align-items: center;
+        gap: 10px;
+      }
+      .bar-label {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      .bar {
+        height: 18px;
+        background: #0e1b3b;
+        border: 1px solid #1b2c5a;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+      }
+      .chunk {
+        height: 100%;
+      }
+      .neg {
+        background: #ff5c7c66;
+      }
+      .neu {
+        background: #ffde7a55;
+      }
+      .pos {
+        background: #2ecc7166;
+      }
+      .legend {
+        display: flex;
+        gap: 14px;
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 10px;
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 6px;
+      }
+      .dot.neg {
+        background: #ff5c7c;
+      }
+      .dot.neu {
+        background: #ffcc66;
+      }
+      .dot.pos {
+        background: #2ecc71;
+      }
+
+      /* Right column */
+      .right {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 16px;
+      }
+
+      .nps .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px dashed #213164;
+      }
+      .nps .row:last-child {
+        border-bottom: none;
+      }
+      .nps .pct {
+        font-weight: 700;
+      }
+      .nps .neg {
+        color: var(--bad);
+      }
+      .nps .neu {
+        color: var(--warn);
+      }
+      .nps .pos {
+        color: var(--ok);
+      }
+
+      .minitrend svg {
+        width: 100%;
+        height: 120px;
+        display: block;
+      }
+      .minitrend .hint {
+        color: var(--muted);
+        font-size: 0.85rem;
+        margin-top: 8px;
+      }
+
+      /* Responsive */
+      @media (max-width: 1100px) {
+        .content {
+          grid-template-columns: 1fr;
+        }
+        .right {
+          grid-template-columns: 1fr;
+          grid-template-rows: auto auto;
+        }
+        .kpis {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 720px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          display: none;
+        }
+        .kpis {
+          grid-template-columns: 1fr;
+        }
+        .bar-row {
+          grid-template-columns: 1fr;
+        }
+        .bar-label {
+          margin-bottom: 6px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app" role="application">
+      <!-- Sidebar -->
+      <nav class="sidebar" aria-label="Navegación lateral">
+        <button class="side-btn active" aria-label="Overview" title="Overview">
+          🏠
+        </button>
+        <button class="side-btn" aria-label="Tabla" title="Tabla">📋</button>
+        <button class="side-btn" aria-label="Gráficos" title="Gráficos">
+          📈
+        </button>
+        <button class="side-btn" aria-label="Sankey" title="Sankey">🧭</button>
+        <button class="side-btn" aria-label="Ajustes" title="Ajustes">
+          ⚙️
+        </button>
+      </nav>
+
+      <!-- Main -->
+      <main class="main">
+        <!-- Topbar -->
+        <header class="topbar" aria-label="Barra superior">
+          <div class="topbar-left">
+            <div class="logo" aria-hidden="true">MC</div>
+            <div class="title">Reporte de células · v4.0.0 (Overview)</div>
+          </div>
+          <div class="actions">
+            <button class="btn" aria-label="Importar CSV o JSON">
+              Importar CSV/JSON
+            </button>
+            <span class="chip" aria-label="Dataset activo"
+              >CSAT_dataset.csv</span
+            >
+          </div>
+        </header>
+
+        <!-- Content -->
+        <section class="content">
+          <!-- Left column -->
+          <div class="stack">
+            <!-- KPIs row -->
+            <div class="kpis" aria-label="Indicadores clave">
+              <article class="card kpi" aria-live="polite">
+                <div class="label">CSAT Canal</div>
+                <div class="value bad">-18%</div>
+              </article>
+              <article class="card kpi">
+                <div class="label">CSAT Inversiones</div>
+                <div class="value ok">5%</div>
+                <div class="label" style="margin-top: 6px; font-size: 0.8rem">
+                  vs Q3 · -2pp · n=100
+                </div>
+              </article>
+              <article class="card kpi">
+                <div class="label">Comentarios</div>
+                <div class="value">87</div>
+              </article>
+              <article class="card kpi">
+                <div class="label">Proyectos</div>
+                <div class="value">12</div>
+              </article>
+            </div>
+
+            <!-- Segmented bars block -->
+            <section class="card" aria-labelledby="drivers-title">
+              <div id="drivers-title" class="block-title">
+                Drivers — Distribución por sentimiento
+              </div>
+              <div class="segmented">
+                <div class="bar-row">
+                  <div class="bar-label">Asesoramiento</div>
+                  <div
+                    class="bar"
+                    role="img"
+                    aria-label="Asesoramiento: 8 Detractores, 6 Neutros, 12 Promotores"
+                  >
+                    <div class="chunk neg" style="width: 32%"></div>
+                    <div class="chunk neu" style="width: 24%"></div>
+                    <div class="chunk pos" style="width: 44%"></div>
+                  </div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">Estabilidad</div>
+                  <div
+                    class="bar"
+                    role="img"
+                    aria-label="Estabilidad: 12 Detractores, 8 Neutros, 10 Promotores"
+                  >
+                    <div class="chunk neg" style="width: 40%"></div>
+                    <div class="chunk neu" style="width: 27%"></div>
+                    <div class="chunk pos" style="width: 33%"></div>
+                  </div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">Extractos</div>
+                  <div
+                    class="bar"
+                    role="img"
+                    aria-label="Extractos: 10 Detractores, 9 Neutros, 11 Promotores"
+                  >
+                    <div class="chunk neg" style="width: 36%"></div>
+                    <div class="chunk neu" style="width: 32%"></div>
+                    <div class="chunk pos" style="width: 32%"></div>
+                  </div>
+                </div>
+                <div class="legend" aria-hidden="true">
+                  <span><span class="dot neg"></span>Detractor</span>
+                  <span><span class="dot neu"></span>Neutro</span>
+                  <span><span class="dot pos"></span>Promotor</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- Footer spacer / could host credits -->
+            <div aria-hidden="true"></div>
+          </div>
+
+          <!-- Right column -->
+          <aside class="right" aria-label="Panel derecho">
+            <section class="card nps" aria-labelledby="nps-title">
+              <div id="nps-title" class="block-title">NPS Breakdown</div>
+              <div class="row">
+                <span>Detractores</span><span class="pct neg">59.8%</span>
+              </div>
+              <div class="row">
+                <span>Neutros</span><span class="pct neu">23.3%</span>
+              </div>
+              <div class="row">
+                <span>Promotores</span><span class="pct pos">14%</span>
+              </div>
+            </section>
+
+            <section class="card minitrend" aria-labelledby="trend-title">
+              <div id="trend-title" class="block-title">Data Chart</div>
+              <svg
+                viewBox="0 0 320 120"
+                role="img"
+                aria-label="Tendencia de ejemplo"
+              >
+                <defs>
+                  <linearGradient id="fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="0%"
+                      stop-color="#7aa2ff"
+                      stop-opacity="0.45"
+                    />
+                    <stop offset="100%" stop-color="#7aa2ff" stop-opacity="0" />
+                  </linearGradient>
+                </defs>
+                <polyline
+                  fill="url(#fill)"
+                  stroke="none"
+                  points="0,90 40,70 80,95 120,60 160,75 200,40 240,80 280,55 320,90 320,120 0,120"
+                />
+                <polyline
+                  fill="none"
+                  stroke="#9bc1ff"
+                  stroke-width="3"
+                  points="0,90 40,70 80,95 120,60 160,75 200,40 240,80 280,55 320,90"
+                />
+                <g fill="#cfe0ff">
+                  <circle cx="40" cy="70" r="3" />
+                  <circle cx="80" cy="95" r="3" />
+                  <circle cx="120" cy="60" r="3" />
+                  <circle cx="160" cy="75" r="3" />
+                  <circle cx="200" cy="40" r="3" />
+                  <circle cx="240" cy="80" r="3" />
+                  <circle cx="280" cy="55" r="3" />
+                </g>
+              </svg>
+              <div class="hint">
+                Gráfico ilustrativo (placeholder). En la app real será ECharts.
+              </div>
+            </section>
+          </aside>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
