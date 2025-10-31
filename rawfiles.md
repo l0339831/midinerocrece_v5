@@ -47,6 +47,7 @@ Below is a file-by-file map of everything under `src/`. Short descriptions expla
 
 ### Top-level
 - `src/App.tsx` — main app layout and routing shell.
+- `src/types.ts` — define the shape of data throughout the application's import, editing, and visualization flows.
 - `src/main.tsx` — app bootstrap (React DOM mount).
 - `src/index.css` — global CSS imports and base styles used by Vite.
 - `src/styles/globals.css` — design tokens and component-level utility styles.
