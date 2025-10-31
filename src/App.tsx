@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import svgPaths from './imports/svg-vuccrd6ozi';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Home, BarChart3, Sparkles, Upload, FileText } from 'lucide-react';
@@ -29,13 +28,15 @@ function Sidebar() {
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                window.location.hash = item.id === 'home' ? '/' : `/${item.id}`;
+              }}
               className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
-                isActive
-                  ? 'bg-accent text-accent-foreground'
-                  : 'text-muted hover:text-sidebar-foreground hover:bg-muted/10'
+                isActive ? 'bg-accent text-accent-foreground' : 'text-muted hover:text-sidebar-foreground hover:bg-muted/10'
               }`}
               title={item.label}
+              aria-current={isActive ? 'page' : undefined}
             >
               <Icon className="w-5 h-5" />
             </button>
