@@ -1,4 +1,5 @@
-import Dexie, { Table } from 'dexie';
+import Dexie from 'dexie';
+import type { Table } from 'dexie';
 import type { Row } from '@/types';
 
 export interface ProjectList { id: string; items: string[]; updatedAt: number; }
