@@ -51,7 +51,7 @@ function Header() {
   return (
     <div className="sticky top-0 bg-background border-b border-border z-40 px-12 py-6">
       <div className="flex items-center justify-between">
-        <h2>Mi Dinero Crece v4.0</h2>
+        <h2>Mi Dinero Crece</h2>
 
         <div className="flex gap-3">
           <Button className="gap-2">
