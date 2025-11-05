@@ -1,12 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
-import Dexie, { Table } from "dexie";
-
+import Dexie from "dexie";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 
+/** Tipos base */
 type KPIKey = "csatChannel" | "csatInvestments" | "csatComments" | "placeholder";
-
 type KPIKind = "percent" | "count";
 
 type KPI = {
@@ -18,255 +16,289 @@ type KPI = {
   subtitle?: string;
 };
 
+/** Persistencia Dexie */
 class KPIDataBase extends Dexie {
-  kpis!: Table<KPI, string>;
-
+  kpis!: Dexie.Table<KPI, string>;
   constructor() {
-    super("midinerocrece");
-    this.version(1).stores({ kpis: "key" });
+    super("mdc_v5");
+    this.version(1).stores({
+      kpis: "key",
+    });
   }
 }
-
 const db = new KPIDataBase();
 
+/** Defaults SIEMPRE 0 */
 const INITIAL_KPIS: KPI[] = [
-  { key: "csatChannel", label: "CSAT Canal", value: -18, kind: "percent", unit: "%" },
-  {
-    key: "csatInvestments",
-    label: "CSAT Inversiones",
-    value: 5,
-    kind: "percent",
-    unit: "%",
-    subtitle: "vs Q3 · -2pp · n=100",
-  },
-  { key: "csatComments", label: "Comentarios", value: 87, kind: "count" },
-  { key: "placeholder", label: "Proyectos", value: 12, kind: "count" },
+  { key: "csatChannel", label: "CSAT Canal", value: 0, kind: "percent", unit: "%", subtitle: "vs Q3 · -2pp" },
+  { key: "csatInvestments", label: "CSAT Inversiones", value: 0, kind: "percent", unit: "%", subtitle: "vs Q3 · -2pp" },
+  { key: "csatComments", label: "Comentarios", value: 0, kind: "count", subtitle: "" },
+  { key: "placeholder", label: "Proyectos", value: 0, kind: "count" },
 ];
 
-const INITIAL_KPI_MAP: Record<KPIKey, KPI> = INITIAL_KPIS.reduce(
-  (acc, item) => {
-    acc[item.key] = item;
-    return acc;
-  },
-  {} as Record<KPIKey, KPI>,
-);
+const INITIAL_KPI_MAP: Record<KPIKey, KPI> = INITIAL_KPIS.reduce((acc, item) => {
+  acc[item.key] = item;
+  return acc;
+}, {} as Record<KPIKey, KPI>);
 
-type DraftState = Record<KPIKey, string | undefined>;
+/** localStorage helpers */
+const LS_KEY = "mdc_v5.kpis";
+function readKpisFromLS(): Partial<Record<KPIKey, number>> | null {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+function writeKpisToLS(kpis: KPI[]) {
+  try {
+    const map: Partial<Record<KPIKey, number>> = {};
+    for (const k of kpis) map[k.key] = k.value;
+    localStorage.setItem(LS_KEY, JSON.stringify(map));
+  } catch { /* no-op */ }
+}
 
-const createEmptyDrafts = (): DraftState =>
+/**
+ * drafts: flag de edición por KPI.
+ * Si `drafts[key]` es `true` → está en modo edición (contentEditable).
+ * No guardamos el valor parcial en React state para evitar re-renders que muevan el caret.
+ */
+type DraftState = Record<KPIKey, boolean>;
+const createDraftFlags = (): DraftState =>
   INITIAL_KPIS.reduce((acc, item) => {
-    acc[item.key] = undefined;
+    acc[item.key] = false;
     return acc;
   }, {} as DraftState);
 
 export default function KPIBoard() {
   const [kpis, setKpis] = useState<KPI[]>(INITIAL_KPIS);
-  const [drafts, setDrafts] = useState<DraftState>(createEmptyDrafts);
+  const [editing, setEditing] = useState<DraftState>(createDraftFlags());
 
+  // Hydratación LS -> Dexie -> defaults
   useEffect(() => {
     let isMounted = true;
-
     const hydrate = async () => {
       try {
-        const persisted = await db.kpis.toArray();
-        if (!isMounted) {
-          return;
+        const fromLS = readKpisFromLS();
+        if (fromLS && isMounted) {
+          const merged = INITIAL_KPIS.map((item) =>
+            typeof fromLS[item.key] === "number" ? { ...item, value: Number(fromLS[item.key]) } : item
+          );
+          setKpis(merged);
         }
 
-        if (persisted.length) {
+        const persisted = await db.kpis.toArray();
+        if (!isMounted) return;
+
+        if (persisted.length && !fromLS) {
           const merged = INITIAL_KPIS.map((item) => {
-            const match = persisted.find((entry) => entry.key === item.key);
-            return match ? { ...item, ...match } : item;
+            const m = persisted.find((e) => e.key === item.key);
+            return m ? { ...item, value: m.value } : item;
           });
           setKpis(merged);
-        } else {
+        } else if (!persisted.length) {
           await db.kpis.bulkPut(INITIAL_KPIS);
         }
       } catch (error) {
         console.error("Unable to hydrate KPI data", error);
       }
     };
-
     void hydrate();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, []);
 
+  /** Formateadores */
   const percentFormatter = useMemo(
-    () =>
-      new Intl.NumberFormat("es-ES", {
-        maximumFractionDigits: 1,
-        signDisplay: "exceptZero",
-      }),
-    [],
+    () => new Intl.NumberFormat("es-ES", { maximumFractionDigits: 1, signDisplay: "exceptZero" }),
+    []
   );
-
   const countFormatter = useMemo(
-    () =>
-      new Intl.NumberFormat("es-ES", {
-        maximumFractionDigits: 0,
-      }),
-    [],
+    () => new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0 }),
+    []
   );
 
   const formatValue = (kpi: KPI) => {
-    const base =
-      kpi.kind === "percent"
-        ? percentFormatter.format(kpi.value)
-        : countFormatter.format(kpi.value);
+    const base = kpi.kind === "percent" ? percentFormatter.format(kpi.value) : countFormatter.format(kpi.value);
     return `${base}${kpi.unit ?? ""}`;
   };
 
-  const handleDraftChange = (key: KPIKey, value: string) => {
-    setDrafts((prev) => ({ ...prev, [key]: value }));
+  /** Acciones de edición */
+  const enterEdit = (key: KPIKey) => {
+    setEditing((prev) => ({ ...prev, [key]: true }));
+  };
+
+  const cancelEdit = (key: KPIKey) => {
+    setEditing((prev) => ({ ...prev, [key]: false }));
   };
 
   const commit = async (key: KPIKey, rawValue: string) => {
     const trimmed = rawValue.trim();
-    if (!trimmed) {
-      setDrafts((prev) => ({ ...prev, [key]: undefined }));
-      return;
-    }
-
+    if (!trimmed) { cancelEdit(key); return; }
     const nextValue = Number(trimmed.replace(",", "."));
-    if (Number.isNaN(nextValue)) {
-      return;
-    }
+    if (Number.isNaN(nextValue)) { cancelEdit(key); return; }
 
-    let updatedEntry: KPI | undefined;
-
+    let updatedList: KPI[] = [];
     setKpis((prev) => {
-      const base = prev.find((item) => item.key === key) ?? INITIAL_KPI_MAP[key];
-      if (!base) {
-        return prev;
-      }
-
-      updatedEntry = { ...base, value: nextValue };
-
-      return prev.map((item) => (item.key === key ? updatedEntry! : item));
+      const next = prev.map((item) => (item.key === key ? { ...item, value: nextValue } : item));
+      updatedList = next;
+      return next;
     });
+    cancelEdit(key);
 
-    setDrafts((prev) => ({ ...prev, [key]: undefined }));
-
-    if (updatedEntry) {
-      try {
-        await db.kpis.put(updatedEntry);
-      } catch (error) {
-        console.error("Unable to persist KPI update", error);
-      }
+    try {
+      await db.kpis.put({ ...(INITIAL_KPI_MAP[key]), value: nextValue });
+    } catch (error) {
+      console.error("Unable to persist KPI update (Dexie)", error);
     }
+    writeKpisToLS(updatedList);
   };
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {kpis.map((kpi) => (
         <KPICard
           key={kpi.key}
           title={kpi.label}
           value={kpi.value}
           formattedValue={formatValue(kpi)}
-          draft={drafts[kpi.key]}
+          isEditing={editing[kpi.key]}
           subtitle={kpi.subtitle}
-          trend={kpi.kind === "percent"
-            ? kpi.value > 0
-              ? "positive"
-              : kpi.value < 0
-                ? "negative"
-                : "neutral"
-            : "neutral"}
-          onDraftChange={(value) => handleDraftChange(kpi.key, value)}
+          trend={kpi.kind === "percent" ? (kpi.value > 0 ? "positive" : kpi.value < 0 ? "negative" : "neutral") : "neutral"}
+          onEnterEdit={() => enterEdit(kpi.key)}
           onCommit={(value) => commit(kpi.key, value)}
-          onResetDraft={() => setDrafts((prev) => ({ ...prev, [kpi.key]: undefined }))}
+          onCancel={() => cancelEdit(kpi.key)}
         />
       ))}
     </div>
   );
 }
 
+/** Card con contentEditable sin re-render en cada tecla (caret estable) */
 interface KPICardProps {
   title: string;
   value: number;
   formattedValue: string;
-  draft: string | undefined;
+  isEditing: boolean;
   subtitle?: string;
   trend: "positive" | "negative" | "neutral";
-  onDraftChange: (value: string) => void;
+  onEnterEdit: () => void;
   onCommit: (value: string) => void;
-  onResetDraft: () => void;
+  onCancel: () => void;
 }
 
 function KPICard({
   title,
   value,
   formattedValue,
-  draft,
+  isEditing,
   subtitle,
   trend,
-  onDraftChange,
+  onEnterEdit,
   onCommit,
-  onResetDraft,
+  onCancel,
 }: KPICardProps) {
-  const displayValue = draft ?? formattedValue;
   const trendClass =
-    trend === "positive"
-      ? "text-primary"
-      : trend === "negative"
-        ? "text-destructive"
-        : "text-foreground";
+    trend === "positive" ? "text-primary" :
+    trend === "negative" ? "text-destructive" :
+    "text-foreground";
 
-  const inputValue = draft ?? String(value);
+  const ref = useRef<HTMLDivElement>(null);
+  const draftRef = useRef<string>("");
 
-  const handleBlur = () => {
-    if (draft === undefined) {
-      return;
+  // Al entrar en edición: setear texto a valor numérico y seleccionar todo
+  useEffect(() => {
+    if (isEditing && ref.current) {
+      draftRef.current = String(value);
+      ref.current.textContent = draftRef.current;
+      ref.current.focus();
+      const sel = window.getSelection?.();
+      if (sel && ref.current.firstChild) {
+        const range = document.createRange();
+        range.selectNodeContents(ref.current);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
     }
-    void onCommit(draft);
+    // Al salir de edición: limpiar texto para que lectura muestre formattedValue
+    if (!isEditing && ref.current) {
+      ref.current.textContent = "";
+    }
+  }, [isEditing, value]);
+
+  const handleCardClick = () => {
+    if (!isEditing) onEnterEdit();
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      if (draft === undefined) {
-        return;
+  const handleInput = () => {
+    if (!ref.current) return;
+    // Filtra caracteres: números, coma, punto, guión
+    const onlyNumber = (ref.current.textContent ?? "").replace(/[^\d\-,.]/g, "");
+    if (onlyNumber !== ref.current.textContent) {
+      // Corrige el contenido sin perder el caret (usar range si se quiere ultra fino)
+      ref.current.textContent = onlyNumber;
+      // Colocar caret al final
+      const sel = window.getSelection?.();
+      if (sel && ref.current.firstChild) {
+        const range = document.createRange();
+        range.selectNodeContents(ref.current);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
       }
+    }
+    draftRef.current = onlyNumber;
+  };
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Enter") {
       event.preventDefault();
-      void onCommit(draft);
+      onCommit(draftRef.current);
       return;
     }
-
     if (event.key === "Escape") {
       event.preventDefault();
-      onResetDraft();
-      event.currentTarget.blur();
+      onCancel();
+      return;
     }
+    if (event.key === "Tab") {
+      event.preventDefault();
+    }
+  };
+
+  const handleBlur = () => {
+    onCommit(draftRef.current);
   };
 
   return (
-    <Card className="hover:shadow-elevation-sm transition-shadow">
+    <Card className="hover:shadow-sm transition-shadow" onClick={handleCardClick}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-medium">
-          {title}
-        </CardTitle>
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <p className={`text-5xl font-semibold leading-tight ${trendClass}`}>
-          {displayValue}
-        </p>
-        {subtitle && (
-          <p className="text-sm">
-            {subtitle}
-          </p>
+      <CardContent className="pt-0">
+        {/* Lectura: render controlado por React */}
+        {!isEditing && (
+          <div className={`text-5xl font-bold ${trendClass}`}>
+            {formattedValue}
+          </div>
         )}
-        <Input
-          aria-label={`Editar ${title}`}
-          inputMode="decimal"
-          placeholder="Actualizar valor"
-          value={inputValue}
-          onChange={(event) => onDraftChange(event.target.value)}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-        />
+
+        {/* Edición: contentEditable no controlado → sin re-render por tecla */}
+        {isEditing && (
+          <div
+            ref={ref}
+            className={`text-5xl font-bold ${trendClass} kpi-ce`}
+            contentEditable
+            suppressContentEditableWarning
+            onInput={handleInput}
+            onKeyDown={handleKeyDown}
+            onBlur={handleBlur}
+            aria-label={`${title} editor`}
+          />
+        )}
+
+        {subtitle && (
+          <p className="text-xs text-muted mt-1">{subtitle}</p>
+        )}
       </CardContent>
     </Card>
   );
