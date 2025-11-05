@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from "react";
+import KPIBoard from './features/kpi/KPIBoard';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Home, BarChart3, Sparkles, Upload, FileText } from 'lucide-react';
@@ -68,34 +69,6 @@ function Header() {
   );
 }
 
-function KPICard({
-  title,
-  value,
-  subtitle,
-  trend,
-}: {
-  title: string;
-  value: string;
-  subtitle?: string;
-  trend?: 'positive' | 'negative' | 'neutral';
-}) {
-  const getTrendColor = () => {
-    if (trend === 'positive') return 'text-primary';
-    if (trend === 'negative') return 'text-destructive';
-    return 'text-foreground';
-  };
-
-  return (
-    <Card className="hover:shadow-elevation-sm transition-shadow">
-      <CardContent className="p-6">
-        <p>{title}</p>
-        <p className={`text-5xl mb-1 ${getTrendColor()}`}>{value}</p>
-        {subtitle && <p className="caption text-muted">{subtitle}</p>}
-      </CardContent>
-    </Card>
-  );
-}
-
 function CSATBreakdown() {
   const data = [
     {
@@ -157,6 +130,24 @@ function TablePlaceholder() {
 }
 
 export default function App() {
+  useEffect(() => {
+    const boot = async () => {
+      try {
+        const hasBootstrap = localStorage.getItem('mdc_boot_3_5_0');
+        if (!hasBootstrap) {
+          // Preload sample assets so first-time navigation feels instant.
+          await fetch('./uploads/projects.json').catch(() => {});
+          await fetch('./uploads/csat_dataset.csv').catch(() => {});
+          localStorage.setItem('mdc_boot_3_5_0', '1');
+        }
+      } catch {
+        // Ignore bootstrap errors; UI can still load without cached assets.
+      }
+    };
+
+    boot();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
@@ -166,17 +157,7 @@ export default function App() {
 
         <main className="px-12 py-6 space-y-6">
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <KPICard title="CSAT Canal" value="-18%" trend="negative" />
-            <KPICard
-              title="CSAT Inversiones"
-              value="5%"
-              subtitle="vs Q3 · -2pp · n=100"
-              trend="positive"
-            />
-            <KPICard title="Comentarios" value="87" trend="neutral" />
-            <KPICard title="Proyectos" value="12" trend="neutral" />
-          </div>
+          <KPIBoard />
 
           {/* Chart and Breakdown Section */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
