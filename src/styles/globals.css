@@ -1,8 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where(.dark &, .dark&));
 
 :root {
+  color-scheme: light;
   --font-size: 14px;
   /* Typography variables */
   --text-h1: 40px;
@@ -49,6 +50,10 @@
   --destructive: rgba(197, 17, 17, 1.00);
   /* The default color for text or elements that appear on top of destructive colored elements. */
   --destructive-foreground: rgba(255, 255, 255, 1.00);
+  /* The color used for background in success actions, such as success messages or success indicators. */
+  --success: rgba(17, 197, 71, 1.00);
+  /* The default color for text or elements that appear on top of success colored elements. */
+  --success-foreground: rgba(255, 255, 255, 1.00);
   /* The default border color for elements such as inputs, buttons, and other containers. */
   --border: rgba(230, 230, 230, 1.00);
   /* The default background color for input fields once the text has been filled. Should be either transparent or match the input-background. */
@@ -90,6 +95,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: rgba(18, 18, 18, 1.00);
   --foreground: rgba(255, 255, 255, 1.00);
   --card: rgba(38, 38, 38, 1.00);
@@ -106,6 +112,8 @@
   --accent-foreground: rgba(255, 255, 255, 1.00);
   --destructive: rgba(197, 17, 17, 1.00);
   --destructive-foreground: rgba(255, 255, 255, 1.00);
+  --success: rgba(17, 197, 71, 1.00);
+  --success-foreground: rgba(255, 255, 255, 1.00);
   --border: rgba(64, 64, 64, 1.00);
   --input: rgba(38, 38, 38, 1.00);
   --input-background: rgba(28, 28, 28, 1.00);
@@ -124,6 +132,8 @@
   --sidebar-accent-foreground: rgba(255, 255, 255, 1.00);
   --sidebar-border: rgba(64, 64, 64, 1.00);
   --sidebar-ring: rgba(250, 100, 0, 1.00);
+  --success: rgba(17, 197, 71, 1.00);
+  --success-foreground: rgba(12, 30, 19, 1.00);
 }
 
 @theme inline {
@@ -143,6 +153,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-input-background: var(--input-background);
@@ -168,12 +180,20 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+  *, *::before, *::after {
+    border-color: var(--color-border);
+  }
+
+  :focus-visible {
+    outline-style: solid;
+    outline-width: 2px;
+    outline-color: var(--color-ring);
+    outline-color: color-mix(in srgb, var(--color-ring) 50%, transparent);
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: var(--font-family-inter);
   }
 }

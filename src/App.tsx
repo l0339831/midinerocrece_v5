@@ -75,25 +75,34 @@ function CSATBreakdown() {
       label: 'Detractores',
       value: '59.8%',
       color: 'text-destructive',
+      fontSize: 'x-large',
+      borderBottom: '1px solid #d4d4d4',
     },
-    { label: 'Neutros', value: '23.3%', color: 'text-primary' },
+    { label: 'Neutros', 
+      value: '23.3%', 
+      color: 'text-muted',
+      fontSize: 'x-large',
+      borderBottom: '1px solid #d4d4d4',
+    },
     {
       label: 'Promotores',
       value: '14%',
-      color: 'text-light-green',
+      color: 'text-success',
+      fontSize: 'x-large',
+      borderBottom: '1px solid #d4d4d4',
     },
   ];
 
   return (
-    <Card className="h-full">
+    <Card className="h-full csat-breakdown">
       <CardHeader>
-        <CardTitle>CSAT Canal</CardTitle>
+        <CardTitle>Valoración clientes</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {data.map((item, index) => (
-          <div key={index} className="flex items-center justify-between">
-            <span>{item.label}</span>
-            <span className={item.color}>{item.value}</span>
+          <div key={index} className="flex items-center justify-between" style={{ borderBottom: item.borderBottom }}>
+            <span style={{ fontSize: item.fontSize}}><b className={item.color}>{item.value}</b></span>
+            <span style={{ fontSize: item.fontSize }}>{item.label}</span>
           </div>
         ))}
       </CardContent>

@@ -686,6 +686,14 @@
     color: var(--foreground);
   }
 
+  .text-success {
+    color: var(--success);
+  }
+
+  .text-success-foreground {
+    color: var(--foreground);
+  }
+
   .text-muted {
     color: var(--muted);
   }
@@ -1030,6 +1038,8 @@
   --accent-foreground: #fff;
   --destructive: #c51111;
   --destructive-foreground: #fff;
+  --success: #16a34a;
+  --success-foreground: #fff; 
   --border: #e6e6e6;
   --input: #fff;
   --input-background: #f2f2f2;
