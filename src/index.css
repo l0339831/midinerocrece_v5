@@ -1169,6 +1169,10 @@ input {
   line-height: 1.2;
 }
 
+.fit-content {
+  height: fit-content;
+}
+
 html {
   font-size: var(--font-size);
 }

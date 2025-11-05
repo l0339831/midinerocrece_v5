@@ -75,34 +75,37 @@ function CSATBreakdown() {
       label: 'Detractores',
       value: '59.8%',
       color: 'text-destructive',
-      fontSize: 'x-large',
+      fontSize: 'xx-large',
+      labelSize: 'large',
       borderBottom: '1px solid #d4d4d4',
     },
     { label: 'Neutros', 
       value: '23.3%', 
       color: 'text-muted',
-      fontSize: 'x-large',
+      fontSize: 'xx-large',
+      labelSize: 'large',
       borderBottom: '1px solid #d4d4d4',
     },
     {
       label: 'Promotores',
       value: '14%',
       color: 'text-success',
-      fontSize: 'x-large',
-      borderBottom: '1px solid #d4d4d4',
+      fontSize: 'xx-large',
+      labelSize: 'large',
+      borderBottom: 'transparent',
     },
   ];
 
   return (
     <Card className="h-full csat-breakdown">
       <CardHeader>
-        <CardTitle>Valoración clientes</CardTitle>
+        <CardTitle>Sentiment</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {data.map((item, index) => (
           <div key={index} className="flex items-center justify-between" style={{ borderBottom: item.borderBottom }}>
             <span style={{ fontSize: item.fontSize}}><b className={item.color}>{item.value}</b></span>
-            <span style={{ fontSize: item.fontSize }}>{item.label}</span>
+            <span style={{ fontSize: item.labelSize }}>{item.label}</span>
           </div>
         ))}
       </CardContent>
@@ -114,12 +117,12 @@ function SentimentChart() {
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>Drivers — Distribución por sentimiento</CardTitle>
+        <CardTitle>Drivers</CardTitle>
       </CardHeader>
       <CardContent className="flex items-center justify-center h-[380px]">
         <div className="text-center space-y-4">
-          <BarChart3 className="w-16 h-16 mx-auto" />
-          <p className="text-muted">Gráfico de distribución por sentimiento</p>
+        
+        
         </div>
       </CardContent>
     </Card>
@@ -173,7 +176,7 @@ export default function App() {
             <div className="lg:col-span-2">
               <SentimentChart />
             </div>
-            <div className="space-y-6">
+            <div className="space-y-6 fit-content">
               <CSATBreakdown />
             </div>
           </div>
