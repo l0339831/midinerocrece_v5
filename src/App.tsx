@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import ReactECharts from 'echarts-for-react';
 import KPIBoard from './features/kpi/KPIBoard';
+import { fetchCsvText, computeDriverStacksFromText } from './features/viz/Sentiment';
+
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Home, BarChart3, Sparkles, Upload, FileText } from 'lucide-react';
@@ -113,20 +116,71 @@ function CSATBreakdown() {
   );
 }
 
-function SentimentChart() {
+export function SentimentChart() {
+  const [option, setOption] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true)
+        const csvPath = './uploads/csat_dataset.csv'
+        const txt = await fetchCsvText(csvPath)
+        const stacks = computeDriverStacksFromText(txt)
+
+        const detrData = stacks.detractorPct.map((pct, i) => ({ value: pct, count: stacks.detractorAbs[i] }))
+        const neutData = stacks.neutroPct.map((pct, i) => ({ value: pct, count: stacks.neutroAbs[i] }))
+        const promData = stacks.promotorPct.map((pct, i) => ({ value: pct, count: stacks.promotorAbs[i] }))
+
+        const opt = {
+          color: ['#dc2626', '#9ca3af', '#16a34a'],
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' },
+            formatter: (params: any) => {
+              const name = params[0]?.axisValueLabel || ''
+              const lines = [`<div style="margin-bottom:4px;"><strong>${name}</strong></div>`]
+              for (const p of params) {
+                const cat = p.seriesName
+                const pct = p.value
+                const cnt = p.data?.count ?? 0
+                lines.push(`${cat}: <strong>${pct}%</strong> — N: ${cnt}`)
+              }
+              return lines.join('<br/>');
+            }
+          },
+          legend: { top: 8, left: 'center', data: ['Detractor', 'Neutro', 'Promotor'], itemWidth: 14, itemHeight: 10, icon: 'roundRect' },
+          grid: { left: 16, right: 24, bottom: 16, top: 48, containLabel: true },
+          xAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%' }, splitLine: { show: true } },
+          yAxis: { type: 'category', data: stacks.labels, axisTick: { show: false }, axisLine: { show: false } },
+          series: [
+            { name: 'Detractor', type: 'bar', stack: 'total', barWidth: 26, label: { show: true, position: 'insideLeft', formatter: '{c}%' }, itemStyle: { borderRadius: [6,0,0,6] }, data: detrData },
+            { name: 'Neutro', type: 'bar', stack: 'total', barWidth: 26, label: { show: true, position: 'inside', formatter: '{c}%' }, data: neutData },
+            { name: 'Promotor', type: 'bar', stack: 'total', barWidth: 26, label: { show: true, position: 'insideRight', formatter: '{c}%' }, itemStyle: { borderRadius: [0,6,6,0] }, data: promData },
+          ],
+        }
+
+        setOption(opt)
+      } catch (err: any) {
+        setError(err?.message || 'Error al cargar CSV')
+      } finally {
+        setLoading(false)
+      }
+    })()
+  }, [])
+
   return (
     <Card className="h-full">
       <CardHeader>
         <CardTitle>Drivers</CardTitle>
       </CardHeader>
-      <CardContent className="flex items-center justify-center h-[380px]">
-        <div className="text-center space-y-4">
-        
-        
-        </div>
+      <CardContent className="flex items-center justify-center h-[380px] w-full">
+        {error && <div className="text-sm text-destructive">{error}</div>}
+        {!error && (loading ? <div className="text-sm opacity-70">Cargando…</div> : <ReactECharts option={option} style={{ height: 340, width: '100%' }} notMerge lazyUpdate />)}
       </CardContent>
     </Card>
-  );
+  )
 }
 
 function TablePlaceholder() {
@@ -148,9 +202,9 @@ export default function App() {
         const hasBootstrap = localStorage.getItem('mdc_boot_3_5_0');
         if (!hasBootstrap) {
           // Preload sample assets so first-time navigation feels instant.
-          await fetch('./uploads/projects.json').catch(() => {});
-          await fetch('./uploads/csat_dataset.csv').catch(() => {});
-          localStorage.setItem('mdc_boot_3_5_0', '1');
+          // await fetch('./uploads/projects.json').catch(() => {});
+          // await fetch('./uploads/csat_dataset.csv').catch(() => {});
+          // localStorage.setItem('mdc_boot_3_5_0', '1');
         }
       } catch {
         // Ignore bootstrap errors; UI can still load without cached assets.

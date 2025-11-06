@@ -198,7 +198,7 @@ function KPICard({
   onCancel,
 }: KPICardProps) {
   const trendClass =
-    trend === "positive" ? "text-primary" :
+    trend === "positive" ? "text-success" :
     trend === "negative" ? "text-destructive" :
     "text-foreground";
 
