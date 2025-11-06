@@ -12,16 +12,14 @@ export function parseCSVRows(text: string): Row[] {
   const clean = normalizeText(text)
   const delimiter = detectDelimiter(clean)
 
-  // Tipamos explícitamente el resultado sin usar genéricos en Papa.parse
-  const result = Papa.parse(clean, {
-    header: true,
-    skipEmptyLines: true,
-    delimiter,
-    dynamicTyping: false,
-    transformHeader: (h: string) => h.trim(),
-  }) as { data: Record<string, unknown>[] }
+const result = Papa.parse(clean, {
+  header: true,
+  skipEmptyLines: true,
+  delimiter,
+  dynamicTyping: false,
+  transformHeader: (h: string) => h.trim(),
+}) as { data: Record<string, unknown>[] }
 
-  // Adaptamos al tipo Row. Si necesitás validación fuerte, mapear campo a campo acá.
   return result.data as unknown as Row[]
 }
 

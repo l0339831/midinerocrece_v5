@@ -64,8 +64,7 @@ export function computeDriverStacks(rows: string[][]) {
   const IDX_SCORE = 1
   const DRIVER_IDXS = [2, 3, 4]
 
-  const acc: Record<string, { detr: number; neut: number; prom: number; total: number }> = {}
-
+const acc: Record<string, { detr: number; neut: number; prom: number; total: number }> = {}
   for (const row of data) {
     const raw = row[IDX_SCORE]
     if (!raw) continue

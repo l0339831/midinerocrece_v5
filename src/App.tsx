@@ -125,7 +125,7 @@ export function SentimentChart() {
     (async () => {
       try {
         setLoading(true)
-        const csvPath = './uploads/csat_dataset.csv'
+        const csvPath = '/uploads/csat_dataset_3.csv'
         const txt = await fetchCsvText(csvPath)
         const stacks = computeDriverStacksFromText(txt)
 
