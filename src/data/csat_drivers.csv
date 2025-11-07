@@ -1,0 +1,87 @@
+﻿date;nota_csat;driver_detractor;driver_neutro;driver_promotor;comentario;segmento_cx;partyID;banca
+2024;4;;Autorizaciones;;prolemas con la conexion y constante desconfiguracion de los permisos de los usuarios. Teniendo constantemente que configurar el administrador usuario. Tambien este mes se incremento no poder realizar operaciones como por ejemplo el uso de inversiones de ;PYME PES;n/A;Empresas
+2024;1;Rendimientos;;;es lento,funciona lente,se cae siempre,ademas en Fima a fin de mes no te da una estadistica de cuanto ganaste como en el online banking ;PYME MICRO;n/A;Empresas
+2024;3;Estabilidad;;;Simplemente nos complica bastante que se caiga seguido, que a veces se pone muy lento, y por sobre todo, que muchas veces habiendo rescatado fima con acreditacion inm. no llega a acreditarse y cuando los directores firman las op salen con error;PYME MICRO;n/A;Empresas
+2024;3;Operaciones;;; Tiene problemas muy seguido , y ademas, no permite anular a los operadores o modificar los movimientos FIMA, cosa que antes no ocurria;AGRO GRANDES;n/A;Empresas
+2024;5;;;Rendimientos;La parte de inversiones deberia mostrar los rendimientos diarios como lo hace la app;PYME PES;n/A;Empresas
+2024;3;Estabilidad;;;En el nuevo home banking no se puede acceder a inversiones, y no se pueden emitir cheques, entre otras cosas.;PYME MICRO;n/A;Empresas
+2024;3;Operaciones;;; los operadores no podemos anular operaciones en caso de contraorden o error, antes de ser firmadas como en el sistema anterior. Los FIMA tampoco. COmplican la operatoria y se cae seguido;AGRO GRANDES;n/A;Empresas
+2024;2;Autorizaciones;;;Pide muchas autorizaciones ademas de la fima digital;EMPRESAS;n/A;Empresas
+2024;2;Movimientos;;;No permite acceso a extracto de fondo común de inversion, entre otros;PYME PES;n/A;Empresas
+2024;2;Estabilidad;;;muchos problemas para que funcione. Justamente en este momento no puedo retirar del Fima para hacer pagos;PYME MICRO;n/A;Empresas
+2024;3;Operaciones;;;No dejan borrar operaciones en caso de error del operador, ni en pagos ni en fima. Complican mucho la gestion,;PYME MICRO;n/A;Empresas
+2024;4;;;;Que el fondo Fima no tenga horarios;PYME PES;n/A;Empresas
+2024;4;;Operaciones;;Al rescatar o programar FIMA, luego en la consulta de operaciones no se vé la fecha programada. En las transferencias, en la conulta por operaciones no muestra el número de operación. Son datos importantes para evitar más pasos en la registración interna.;AGRO GRANDES;n/A;Empresas
+2024;3;Autorizaciones;;;El cambio realizado con el extracto de inversiones fue para peor. Ahora hay que estar pidiendolo para dentro de 24hs. Por otro lado no puedo ver online la posicion de inversiones. Otro tema, por temas de seguridad no estuve pudiendo realizar pagos.;PYME PES;n/A;Empresas
+2024;5;;;Rendimientos;Incluyan graficos para ver rendimientos FIMA, comparativa, algo mas visual. Yo soy Economista y Cientifico de Datos, escribanme a cgsalvay@gmail.com y les mando una propuesta para un bot de inversiones en FIMA;PYME MICRO;n/A;Empresas
+2024;4;;Estabilidad;;Que no falle la seccion de rescate fima y pago de servicios q hay momentos q no está operativa en horario bancario;RENTA ALTA;n/A;Individuos
+2024;3;;;;FIMA FALLA CADA PREVIA DE FIN DE SEMANA LARGO, FIMA NO MUESTRA TASAS;PYME PES;n/A;Empresas
+2024;3;Movimientos;;;resumenes y extractos se demoran ultimamente en aparecer para poder bajarlos, sobre todo el de inversiones.;EMPRESAS;n/A;Empresas
+2024;3;Operaciones;;;no puedo abrir la cuenta de inversion;PYME MICRO;n/A;Empresas
+2024;4;;Autorizaciones;;Alago para revisar ,en autorizaciones,si uno se equivoca en un echeq o transferencia ,permanece en la lista y no encuentro la forma de eliminarlo de la lista.Otro tema es el de las inversiones ,si se puede igualar al de la cta personal. ;PYME MICRO;n/A;Empresas
+2024;3;Estabilidad;;;El portfolio de inversiones siempre está roto y no permite ver el detalle;N/A;n/A;
+2024;5;;;Rendimientos;mas info en inversiones;EMPRESAS;n/A;Empresas
+2024;2;Estabilidad;;;INVERSIONES. ERROR AL INTENTAR VER PORTFOLIO. NO PUEDO ANALIZAR RENDIMEINTOS EN FONDOS FIMA. ;PYME MICRO;n/A;Empresas
+2024;4;;Estabilidad;;Se traba, se demora en cargar, no permite ver bien el sector de inversiones;PYME PES;n/A;Empresas
+2024;1;Estabilidad;;;Error para visualizar el rubro inversiones con mi usuario;SP;n/A;SP
+2024;1;Estabilidad;;;te pide que repitas la misma clave 700 veces, se cae seguido, la version nueva es mala, tiene poco lugar para ver dígitos. pensaron poco en el cliente antes de invertir... harto de que me suban las comisiones para cada vez hacer más trabajo nosotros;EMPRESAS;n/A;Empresas
+2024;1;Estabilidad;;;No apareecen las cuentas frecuentes cargadas en la version anterior, no veo las inversiones que he realizado en fondos fima.;PYME MICRO;n/A;Empresas
+2024;2;Estabilidad;;;no puedo rescatar dinero del fima;SP;n/A;SP
+2024;5;;;Rendimientos;mejoro bastante la interaccion  con el usuario, faltaria mas informaion etadistiaca sobre el manejo de Fondo fima, actualmente escasa informacion de rendimientos por ej, o permitir pagar desde fondo fima directamente;PYME MICRO;n/A;Empresas
+2024;3;Operaciones;;;me gustaria que los operadores puedan Eliminar operaciones si hubo algun error antes de ser autorizados (incluyendo op FIMA) y que el campo Descripcion tenga muchos mas caracteres para las operaciones que lo necesiten;PYME MICRO;n/A;Empresas
+2024;2;Movimientos;;; los informes de algunos productos, son totalmente incomprensibles. Por ejemplo, los de FIMA. Ahora viene todo mezclado, antes era impecable. No sé que manía tienen de modificar lo que funciona bien;AGRO GRANDES;n/A;Empresas
+2024;2;Autorizaciones;;;hice un rescate de FIMA y no se acreditó;PYME MICRO;n/A;Empresas
+2024;2;Autorizaciones;;;tiene muchas trabas para liberar mi plata en el fondo comun de inversion, en varias ocasiones intente y me sale un mensaje que no esta disponible la opcion, lo cual me hace pensar en no confiarles mi dinero, ya que cuando lo necesito, no lo tengo disponib;AGRO PES;n/A;Empresas
+2024;3;Rendimientos;;;la informacion de los portfolios de inversion es escasa, sobre todo el rendimiento;PYME PES;n/A;Empresas
+2024;3;Estabilidad;;;No veo mis inversiones en muchas oportunidades y falta un  iten que diga cuanto tengo invertido y en que, en muchas oportunidades necesito entrar en el rescate de de fima para conocer lo que tengo. ;PYME MICRO;n/A;Empresas
+2024;4;;Autorizaciones;;"Soy autorizado (completo) no administrador, y me piden que sea administrador para comprar bonos y acciones; no le veo sentido al requisito";AGRO PES;n/A;Empresas
+2024;2;Rendimientos;;;la sección de inversiones no tiene datos de retornos, en fin mucho que mejorar;PYME PES;n/A;Empresas
+2024;3;Rendimientos;;;No puedo ver el rendimiento de las inversiones en fondos Fima;N/A;n/A;
+2024;4;;Movimientos;;Es mala la información de resultado generado en Fondos comunes. ;AGRO PES;n/A;Empresas
+2024;5;;;Rendimientos;Poder ver el rendimiento diario de los fondos fima;PYME MICRO;n/A;Empresas
+2024;1;Estabilidad;;;frecuentemente no puedo tener acceso a algunas funciones, no puedo rescatar del fondo Fima, no puedo ver el saldo de la cuenta , etc.;PYME PES;n/A;Empresas
+2024;4;;Operaciones;;al consultar un rescate o suscripcion Fima no muestra la fecha a la que está programado;N/A;n/A;
+2024;2;Abandonos;;;funciona mal. al querer hacer un rescate Fima responde que el fondo ya cerro (antes de 14.30 hs). desde el telefono pude hacer el rescate sin problemas;PYME MICRO;n/A;Empresas
+2024;3;Movimientos;;;NO SE PUEDE BAJAR EN EXCEL UN HISTORICO DE FIMA;AGRO PES;n/A;Empresas
+2024;1;Estabilidad;;;No me deja operar en el FIMA, me esta diciendo ahora que no tenemos fondos cuando sí los tenemos. ;EMPRESAS;n/A;Empresas
+2024;3;Operaciones;;;En los rescates fima programados, al consultarlos no muestra la fecha programada. Los importes en los rescates o suscrpciones no tienen separadores de mil;AGRO GRANDES;n/A;Empresas
+2024;4;;Rendimientos;;Seria muy bueno que la sección de inversiónes funcione como funciona para las cajas de ahorro. Poder ver los graficos de rendimiento y demas.;N/A;n/A;
+2024;1;;;;prohibición de usar el fima un día hábil;PYME MICRO;n/A;Empresas
+Q12025;5;;;Asesoramiento;apalancamiento e inversiones;N/A;n/A;
+Q12025;3;Estabilidad;;;No se puede acceder a fondos fima;N/A;n/A;
+Q12025;3;Rendimientos;;;Estaria bueno tener mas informacion sobre como son las ganancias y que sea mas amigable la vista;PYME MICRO;n/A;Empresas
+Q12025;4;;Estabilidad;;Que aparezca toda la información de las inversiones, nunca se puede ver dice que no esta disponible. Y además hay muchas funcoines que en la app tampoco funcionan correctamente;N/A;n/A;
+Q12025;5;;;Estabilidad;NO ESTA FUNCIONANDO LA PARTE DE FONDOS FIMA;PYME PES;n/A;Empresas
+Q12025;3;Movimientos;;;los comprobantes de gs de inversiones;PYME PES;n/A;Empresas
+Q12025;5;;;Autorizaciones;cuando se carga un fima, rescate o suscripcion, quien autoriza no sabe si se hizo para ya o diferido, no da esa informacion;AGRO GRANDES;n/A;Empresas
+Q12025;4;;Movimientos;;A veces es difícil saber adonde está lo que uno busca. Cuando se trata del tema de inversiones, por ejemplo, encontrar con las facilidad en que lugar se encuentra la información de las mismas y los movimientos. En FIMA, solamente a fin de mes se puede ver;AGRO PES;n/A;Empresas
+Q12025;5;;;Rendimientos;funcional perfecta. me gustaria ver la parte de inversiones con los rendimientos diarios porcentajes etc ;EMPRESAS;n/A;Empresas
+Q12025;4;;Cantidad de clics;;para invertir en los fondos fima deberia ser mas sencillo, con menos pasas, como en la cuenta personal. el banco supervielle tiene unn item que se llama inversion rapida, es mucho mas practico;PYME PES;n/A;Empresas
+Q12025;4;;Asesoramiento;;contacto más fluido con los comerciales, sobre todo en consultas sobre inversiones;AGRO PES;n/A;Empresas
+Q12025;3;Estabilidad;;;Cuando se hace consultas, se hace una accion, al volver a la consulta hay que realizarla de nuevo, ej e-cheq. Los fondos de inversion no son muy claros y es muy dificil encontrar la informacion, los saldos son solo del ultimo dia, no hay anteriores;PYME MICRO;n/A;Empresas
+Q12025;4;;Rendimientos;;tener mas info en el seguimiento de la parte de inversiones ;PYME MICRO;n/A;Empresas
+Q12025;3;Movimientos;;;Poder descargar el reporte de impuesto para FIMA;PYME PES;n/A;Empresas
+Q12025;1;Rendimientos;;;Seria útil tener un panel de evolucion de inversiones que permita evaluar rendimiento obtenido ;PYME MICRO;n/A;Empresas
+Q12025;3;Estabilidad;;;DESDE QUE TENGO EL FONDO FIMA QUE NO PUEDO VER NUNCA DETALLE DEL MISMO, SIEMPRE DA ERROR Y SEGUN EN DONDE QUIERAS CONSULTAR TAMBIEN DA ERROR;PYME MICRO;n/A;Empresas
+Q12025;2;Estabilidad;;;MUCHOS ACCESOS DENTRO DEL SITIO DAN ERROR. PORFOLIO DE INVERSIONES, ETC. ;PYME MICRO;n/A;Empresas
+Q12025;4;;Rendimientos;;Me gustaría poder ver mejor los rendimientos del FIMA.;PYME MICRO;n/A;Empresas
+Q12025;3;Autorizaciones;;;"me hartan con las claves si es movil tiene que poder hacerse TODO en MOvil yo debo decir que cana;l uso NO ustedes ademas ya no puedo usar el ipad es una cosa de locos porqiue no viajo con la pc y viajo todo el tiem[po quiero hacer una inversion en fima y";PYME MICRO;n/A;Empresas
+Q12025;5;;;Operaciones;cuando uno va a rescatar fondos sería bueno que en cuentas propias en vez de la cuenta figure el CBU o cc y cta especial, la última vez hice una transferencia al reves de lo que quería;PYME PES;n/A;Empresas
+Q12025;3;Rendimientos;;;En Fima fondo quiero ver lo capitalizado en 2024 no lo puedo ver;PYME MICRO;n/A;Empresas
+Q12025;2;Rendimientos;;;En las inversiones, ej FIMA, no se puede observar claramente el rendimiento;PYME MICRO;n/A;Empresas
+Q12025;2;Rendimientos;;;fima: debería tener la posibilidad de dejar reflejado cual era el saldo valorizado a la fecha que uno requiera, sería de mucha utilidad;AGRO PES;n/A;Empresas
+Q12025;1;Movimientos;;;Todas las opciones, no funciona entero, cuando puedo acceder a los extractos, se cae inversiones, cuando cargo los salarios no me toma el archivo o lo rechaza al aprobar.  Un horror;PYME MICRO;n/A;Empresas
+Q12025;2;Rendimientos;;;mejorar la informacion del portfolio de inversiones ;PYME MICRO;n/A;Empresas
+Q22025;1;Autorizaciones;;;No tengo como antes en la página inicial el saldo de los fondos, cuando rescato, tengo que cargar y autorizar aunque vaya a cuentas propias, El HB de personas físicas es mucho mejor.;PYME MICRO;n/A;Empresas
+Q22025;4;;;;los Fima no se pueden acceder los fines de semana y la empresa trabaja |. ;PYME MICRO;n/A;Empresas
+Q22025;3;Movimientos;;;no encontre donde ver el extracto de FIMA mes de marzo;PYME PES;n/A;Empresas
+Q22025;4;;Estabilidad;;A VEECES SE CUELGA CON FIMA;PYME MICRO;n/A;Empresas
+Q22025;5;;;Movimientos;Me gustaria que cuando consultas en el porfolio de inversiones pueda descargar el movimiento diario en excel .;PYME MICRO;n/A;Empresas
+Q22025;4;;Asesoramiento;;Inversiones u poco mas entendible;PYME MICRO;n/A;Empresas
+Q22025;4;;Asesoramiento;;mas informacion  sobre inverciones y una opcion para buscar los cheques pagados mas facil;PYME PES;n/A;Empresas
+Q22025;4;;Estabilidad;;No anda en la nueva version la parte de inversiones;PYME PES;n/A;Empresas
+Q22025;5;;;Autorizaciones;en fondos fima, en los rescates diferidos, quien firma, si no es el mismo que lo preparo, no ve la fecha al cual se hizo. Por otro lado hay veces que no muestra el detalle de la operacion a firmar (por ej en endoso de cheques). a veces muestra a veces no;AGRO GRANDES;n/A;Empresas
+Q22025;3;Autorizaciones;;;No se pueden ver consulta de operaciones.... puedo ver operaciones, pero ahi, no esta FIMA, etc.;PYME PES;n/A;Empresas
+Q22025;4;;Movimientos;;aun no puedo descargar los cimprobantes de movimientos de fima;AGRO PES;n/A;Empresas
+Q22025;1;Estabilidad;;;es imposible trabajar en una empresa cuando en cualquier momento no funciona el sistema, se pone muy lento, No se puede invertir o sacar dinero de los fondos , etc;EMPRESAS;n/A;Empresas
+Q22025;1;Estabilidad;;;No funciona y se cae seguido. La plataforma de rescates de fondos Fima es muy mala, funciona mal y falla constantemente.;PYME PES;n/A;Empresas

@@ -1,0 +1,97 @@
+[
+  {
+    "drivers": "Asesoramiento",
+    "cantidad": 5,
+    "sentiments": "promotor"
+  },
+  {
+    "drivers": "Autorizaciones",
+    "cantidad": 10,
+    "sentiments": "promotor"
+  },
+  {
+    "drivers": "Estabilidad",
+    "cantidad": 5,
+    "sentiments": "promotor"
+  },
+  {
+    "drivers": "Movimientos",
+    "cantidad": 5,
+    "sentiments": "promotor"
+  },
+  {
+    "drivers": "Operaciones",
+    "cantidad": 5,
+    "sentiments": "promotor"
+  },
+  {
+    "drivers": "Rendimientos",
+    "cantidad": 30,
+    "sentiments": "promotor"
+  },
+  {
+    "drivers": "Abandonos",
+    "cantidad": 2,
+    "sentiments": "neutro"
+  },
+  {
+    "drivers": "Autorizaciones",
+    "cantidad": 16,
+    "sentiments": "neutro"
+  },
+  {
+    "drivers": "Estabilidad",
+    "cantidad": 36,
+    "sentiments": "neutro"
+  },
+  {
+    "drivers": "Movimientos",
+    "cantidad": 20,
+    "sentiments": "neutro"
+  },
+  {
+    "drivers": "Operaciones",
+    "cantidad": 18,
+    "sentiments": "neutro"
+  },
+  {
+    "drivers": "Rendimientos",
+    "cantidad": 22,
+    "sentiments": "neutro"
+  },
+  {
+    "drivers": "Asesoramiento",
+    "cantidad": 12,
+    "sentiments": "detractor"
+  },
+  {
+    "drivers": "Autorizaciones",
+    "cantidad": 12,
+    "sentiments": "detractor"
+  },
+  {
+    "drivers": "Cantidad de clics",
+    "cantidad": 4,
+    "sentiments": "detractor"
+  },
+  {
+    "drivers": "Estabilidad",
+    "cantidad": 20,
+    "sentiments": "detractor"
+  },
+  {
+    "drivers": "Movimientos",
+    "cantidad": 12,
+    "sentiments": "detractor"
+  },
+  {
+    "drivers": "Operaciones",
+    "cantidad": 8,
+    "sentiments": "detractor"
+  },
+  {
+    "drivers": "Rendimientos",
+    "cantidad": 12,
+    "sentiments": "detractor"
+  }
+]

@@ -1,0 +1,20 @@
+drivers;cantidad;sentiments
+Asesoramiento;5;promotor
+Autorizaciones;10;promotor
+Estabilidad;5;promotor
+Movimientos;5;promotor
+Operaciones;5;promotor
+Rendimientos;30;promotor
+Abandonos;2;neutro
+Autorizaciones;16;neutro
+Estabilidad;36;neutro
+Movimientos;20;neutro
+Operaciones;18;neutro
+Rendimientos;22;neutro
+Asesoramiento;12;detractor
+Autorizaciones;12;detractor
+Cantidad de clics;4;detractor
+Estabilidad;20;detractor
+Movimientos;12;detractor
+Operaciones;8;detractor
+Rendimientos;12;detractor

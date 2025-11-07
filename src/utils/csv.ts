@@ -53,3 +53,4 @@ export function parseCSVMatrix(text: string, delimiter?: string): string[][] {
   if (row.length) pushRow()
   return rows.filter(r => r.some(c => String(c).trim().length > 0))
 }
+
