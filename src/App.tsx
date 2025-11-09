@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import KPIBoard from './features/kpi/KPIBoard';
 
-import SentimentChart_v093 from '@/features/viz/SentimentChart_v095';
+import SentimentChart_v093 from '@/features/viz/SentimentChart';
 
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';

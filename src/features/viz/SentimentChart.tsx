@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react'
 import ReactECharts from 'echarts-for-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { SentimentJSONRow } from '@/features/viz/SentimentModel_v1'
-import { aggregateFromJSON } from '@/features/viz/SentimentModel_v1'
+import type { SentimentJSONRow } from '@/features/viz/SentimentModel'
+import { aggregateFromJSON } from '@/features/viz/SentimentModel'
 
 export default function SentimentChart_v095() {
   const [option, setOption] = useState<any>(null)
@@ -29,40 +29,36 @@ export default function SentimentChart_v095() {
 
         setError(null)
         setOption({
-          color: ['#dc2626', '#9ca3af', '#16a34a'],
-          legend: { top: 8, left: 'center', data: ['Detractor', 'Neutro', 'Promotor'], itemWidth: 14, itemHeight: 10, icon: 'roundRect' },
-          grid: { left: leftPx, right: 24, bottom: 36, top: 48, containLabel: true },
+          color: ['#dc2626', '#f9cd0cff', '#16a34a'],
+          legend: { data: ['Detractor', 'Neutro', 'Promotor'] },
+          grid: { containLabel: true },
           tooltip: {
-            trigger: 'axis', axisPointer: { type: 'shadow' }, confine: true,
-            formatter: (params: any[]) => {
-              const idx = params[0].dataIndex
-              const name = agg.labels[idx]
-              const lines = [`<div style="margin-bottom:4px;max-width:440px;white-space:normal;"><strong>${name}</strong></div>`]
-              lines.push(`Detractor: <strong>${agg.detractorPct[idx]}%</strong> — N: ${agg.detractorAbs[idx]}`)
-              lines.push(`Neutro: <strong>${agg.neutroPct[idx]}%</strong> — N: ${agg.neutroAbs[idx]}`)
-              lines.push(`Promotor: <strong>${agg.promotorPct[idx]}%</strong> — N: ${agg.promotorAbs[idx]}`)
-              lines.push(`<span style="opacity:.7">Total: n=${agg.totals[idx]}</span>`)
-              return lines.join('<br/>')
-            }
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' },
           },
-          xAxis: { type: 'value', max: 100, axisLabel: { formatter: '{value}%' }, splitLine: { show: true } },
+          xAxis: { 
+            type: 'value', 
+            max: 100, 
+            axisLabel: { formatter: '{value}%' }, 
+            splitLine: { show: true } 
+          },
           yAxis: { 
             type: 'category', data: agg.labels, axisTick: { show: false }, axisLine: { show: false },
-            axisLabel: { width: leftPx - 24, overflow: 'truncate', lineHeight: 18, interval: 0 },
+            axisLabel: { width: leftPx - 24, overflow: 'truncate', interval: 0 },
           },
           series: [
-            { name: 'Detractor', type: 'bar', stack: 'sentiments', barWidth: 24,
+            { name: 'Detractor', type: 'bar', stack: 'sentiments', barWidth: 14,
               labelLayout: { hideOverlap: true },
               label: { show: true, position: 'insideLeft', formatter: (p:any) => (p.value >= 8 ? `${p.value}%` : '') },
-              itemStyle: { borderRadius: [6,0,0,6] }, data: detrData },
-            { name: 'Neutro', type: 'bar', stack: 'sentiments', barWidth: 24,
+              itemStyle: {}, data: detrData },
+            { name: 'Neutro', type: 'bar', stack: 'sentiments', barWidth: 14,
               labelLayout: { hideOverlap: true },
               label: { show: true, position: 'inside', formatter: (p:any) => (p.value >= 8 ? `${p.value}%` : '') },
               data: neutData },
-            { name: 'Promotor', type: 'bar', stack: 'sentiments', barWidth: 24,
+            { name: 'Promotor', type: 'bar', stack: 'sentiments', barWidth: 14,
               labelLayout: { hideOverlap: true },
               label: { show: true, position: 'insideRight', formatter: (p:any) => (p.value >= 8 ? `${p.value}%` : '') },
-              itemStyle: { borderRadius: [0,6,6,0] }, data: promData },
+              itemStyle: {}, data: promData },
           ],
         })
       } catch (e:any) {
