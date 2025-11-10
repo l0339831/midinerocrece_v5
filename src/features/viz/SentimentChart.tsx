@@ -72,7 +72,10 @@ export default function SentimentChart_v095() {
 
   return (
     <Card className="h-full">
-      <CardHeader><CardTitle>CSAT Inversiones Drivers</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle>Drivers principales</CardTitle>
+        <p className="text-xs text-muted badge">CSAT Inversiones</p>
+      </CardHeader>
       <CardContent className="flex items-center justify-center h-[420px] w-full">
         {loading && <div className="text-sm opacity-70">Cargando…</div>}
         {!loading && error && <div className="text-sm text-destructive whitespace-pre-wrap">{error}</div>}

@@ -5,12 +5,22 @@ import SentimentChart_v093 from '@/features/viz/SentimentChart';
 
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
-import { Home, BarChart3, Sparkles, Upload, FileText } from 'lucide-react';
+import { Home, BarChart3, Sparkles, Upload, FileText, type LucideIcon } from 'lucide-react';
+import Datos from './views/Datos';
 
-function Sidebar() {
-  const [activeTab, setActiveTab] = useState('home');
+type ViewKey = 'home' | 'datos' | 'proyectos' | 'exportar';
 
-  const navItems = [
+const allowedViews: ViewKey[] = ['home', 'datos', 'proyectos', 'exportar'];
+
+function getViewFromHash(): ViewKey {
+  if (typeof window === 'undefined') return 'home';
+  const raw = window.location.hash.replace(/^#\/?/, '').trim();
+  if (!raw) return 'home';
+  return allowedViews.includes(raw as ViewKey) ? (raw as ViewKey) : 'home';
+}
+
+function Sidebar({ current, onChange }: { current: ViewKey; onChange: (v: ViewKey) => void }) {
+  const navItems: Array<{ id: ViewKey; icon: LucideIcon; label: string }> = [
     { id: 'home', icon: Home, label: 'Inicio' },
     { id: 'datos', icon: FileText, label: 'Data' },
     { id: 'proyectos', icon: BarChart3, label: 'Proyectos' },
@@ -28,13 +38,12 @@ function Sidebar() {
       <nav className="flex flex-col gap-2 flex-1">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeTab === item.id;
+          const isActive = current === item.id;
           return (
             <button
               key={item.id}
               onClick={() => {
-                setActiveTab(item.id);
-                window.location.hash = item.id === 'home' ? '/' : `/${item.id}`;
+                onChange(item.id);
               }}
               className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
                 isActive ? 'bg-accent text-accent-foreground' : 'text-muted hover:text-sidebar-foreground hover:bg-muted/10'
@@ -103,6 +112,7 @@ function CSATBreakdown() {
     <Card className="h-full csat-breakdown">
       <CardHeader>
         <CardTitle>Sentiment</CardTitle>
+        <p className="text-xs text-muted">CSAT Inversiones</p>
       </CardHeader>
       <CardContent className="space-y-4">
         {data.map((item, index) => (
@@ -111,6 +121,21 @@ function CSATBreakdown() {
             <span style={{ fontSize: item.labelSize }}>{item.label}</span>
           </div>
         ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function CSATStackedBar() {
+  return (
+    <Card className="h-full">
+      <CardHeader>
+        <CardTitle>CSAT Stacked Bar</CardTitle>
+      </CardHeader>
+      <CardContent className="flex items-center justify-center py-24">
+        <p className="text-muted">
+          Espacio reservado para comparar ambos CSATs
+        </p>
       </CardContent>
     </Card>
   );
@@ -128,7 +153,25 @@ function TablePlaceholder() {
   );
 }
 
+function ViewPlaceholder({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold">{title}</h1>
+      <p className="mt-2 text-sm opacity-80">{description}</p>
+    </div>
+  );
+}
+
 export default function App() {
+  const [view, setView] = useState<ViewKey>(() => getViewFromHash());
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleHashChange = () => setView(getViewFromHash());
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   useEffect(() => {
     const boot = async () => {
       try {
@@ -147,29 +190,48 @@ export default function App() {
     boot();
   }, []);
 
+  const handleViewChange = (next: ViewKey) => {
+    setView(next);
+    if (typeof window !== 'undefined') {
+      window.location.hash = next === 'home' ? '/' : `/${next}`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <Sidebar />
+      <Sidebar current={view} onChange={handleViewChange} />
 
       <div className="ml-16">
         <Header />
 
         <main className="px-12 py-6 space-y-6">
-          {/* KPI Cards */}
-          <KPIBoard />
-
-          {/* Chart and Breakdown Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <SentimentChart_v093 />
-            </div>
-            <div className="space-y-6 fit-content">
-              <CSATBreakdown />
-            </div>
-          </div>
-
-          {/* Table Placeholder */}
-          <TablePlaceholder />
+          {view === 'home' && (
+            <>
+              <KPIBoard />
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <SentimentChart_v093 />
+                </div>
+                <div className="space-y-6 fit-content">
+                  <CSATStackedBar />
+                  <CSATBreakdown />
+                </div>
+              </div>
+              
+            </>
+          )}
+          {view === 'datos' && (
+            <>
+            
+            <TablePlaceholder />
+            </>
+          )}
+          {view === 'proyectos' && (
+            <ViewPlaceholder title="Proyectos" description="Esta vista listará y administrará proyectos." />
+          )}
+          {view === 'exportar' && (
+            <ViewPlaceholder title="Exportar" description="Esta vista contendrá flujos y reportes de exportación." />
+          )}
         </main>
       </div>
     </div>
