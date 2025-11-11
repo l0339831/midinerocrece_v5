@@ -2,8 +2,30 @@
 import { useEffect, useState } from 'react'
 import ReactECharts from 'echarts-for-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { SentimentJSONRow } from '@/features/viz/SentimentModel'
+import type { SentimentJSONRow, SentimentKey } from '@/features/viz/SentimentModel'
 import { aggregateFromJSON } from '@/features/viz/SentimentModel'
+
+function computeAverageBySentiment(rows: SentimentJSONRow[]): Record<SentimentKey, number> {
+  const stats: Record<SentimentKey, { sum: number; count: number }> = {
+    detractor: { sum: 0, count: 0 },
+    neutro: { sum: 0, count: 0 },
+    promotor: { sum: 0, count: 0 },
+  }
+
+  for (const row of rows || []) {
+    const key = String(row?.sentiments ?? '').toLowerCase() as SentimentKey
+    const value = Number(row?.cantidad ?? 0)
+    if (!stats[key] || !Number.isFinite(value)) continue
+    stats[key].sum += value
+    stats[key].count += 1
+  }
+
+  return {
+    detractor: stats.detractor.count ? stats.detractor.sum / stats.detractor.count : 0,
+    neutro: stats.neutro.count ? stats.neutro.sum / stats.neutro.count : 0,
+    promotor: stats.promotor.count ? stats.promotor.sum / stats.promotor.count : 0,
+  }
+}
 
 export default function SentimentChart_v095() {
   const [option, setOption] = useState<any>(null)
@@ -22,6 +44,15 @@ export default function SentimentChart_v095() {
 
         if (!agg.labels.length) throw new Error('Dataset vacío o sin drivers')
 
+        const avgBySentiment = computeAverageBySentiment(json)
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('mdc_sentiment_avg', JSON.stringify(avgBySentiment))
+          } catch (storageErr) {
+            console.warn('[SentimentChart_v095] no se pudo guardar mdc_sentiment_avg', storageErr)
+          }
+        }
+
         const leftPx = Math.max(220, Math.min(480, Math.round(Math.max(...agg.labels.map(s => s.length)) * 7)))
         const detrData = agg.detractorPct.map((pct, i) => ({ value: pct, count: agg.detractorAbs[i] }))
         const neutData = agg.neutroPct.map((pct, i) => ({ value: pct, count: agg.neutroAbs[i] }))
@@ -29,7 +60,7 @@ export default function SentimentChart_v095() {
 
         setError(null)
         setOption({
-          color: ['#dc2626', '#f9cd0cff', '#16a34a'],
+          color: ['#c51111', '#f59e0b', '#16a34a'],
           legend: { data: ['Detractor', 'Neutro', 'Promotor'] },
           grid: { containLabel: true },
           tooltip: {
@@ -43,20 +74,22 @@ export default function SentimentChart_v095() {
             splitLine: { show: true } 
           },
           yAxis: { 
-            type: 'category', data: agg.labels, axisTick: { show: false }, axisLine: { show: false },
-            axisLabel: { width: leftPx - 24, overflow: 'truncate', interval: 0 },
+            type: 'category', data: agg.labels, axisTick: { show: false }, axisLine: { show: false }
           },
           series: [
-            { name: 'Detractor', type: 'bar', stack: 'sentiments', barWidth: 14,
+            { name: 'Detractor', type: 'bar', stack: 'sentiments', 
               labelLayout: { hideOverlap: true },
+              emphasis: { focus: 'series' },
               label: { show: true, position: 'insideLeft', formatter: (p:any) => (p.value >= 8 ? `${p.value}%` : '') },
               itemStyle: {}, data: detrData },
-            { name: 'Neutro', type: 'bar', stack: 'sentiments', barWidth: 14,
+            { name: 'Neutro', type: 'bar', stack: 'sentiments',
               labelLayout: { hideOverlap: true },
+              emphasis: { focus: 'series' },
               label: { show: true, position: 'inside', formatter: (p:any) => (p.value >= 8 ? `${p.value}%` : '') },
               data: neutData },
-            { name: 'Promotor', type: 'bar', stack: 'sentiments', barWidth: 14,
+            { name: 'Promotor', type: 'bar', stack: 'sentiments',
               labelLayout: { hideOverlap: true },
+              emphasis: { focus: 'series' },
               label: { show: true, position: 'insideRight', formatter: (p:any) => (p.value >= 8 ? `${p.value}%` : '') },
               itemStyle: {}, data: promData },
           ],

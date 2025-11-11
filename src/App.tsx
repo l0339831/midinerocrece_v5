@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ReactECharts from 'echarts-for-react';
 import KPIBoard from './features/kpi/KPIBoard';
 
 import SentimentChart_v093 from '@/features/viz/SentimentChart';
@@ -6,7 +7,6 @@ import SentimentChart_v093 from '@/features/viz/SentimentChart';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Home, BarChart3, Sparkles, Upload, FileText, type LucideIcon } from 'lucide-react';
-import Datos from './views/Datos';
 
 type ViewKey = 'home' | 'datos' | 'proyectos' | 'exportar';
 
@@ -81,26 +81,50 @@ function Header() {
   );
 }
 
+type SentimentAverage = { detractor: number; neutro: number; promotor: number }
+const defaultSentimentAverage: SentimentAverage = { detractor: 0, neutro: 0, promotor: 0 }
+
 function CSATBreakdown() {
+  const [averages, setAverages] = useState<SentimentAverage>(defaultSentimentAverage)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const raw = localStorage.getItem('mdc_sentiment_avg')
+      if (!raw) return
+      const parsed = JSON.parse(raw) ?? {}
+      setAverages({
+        detractor: Number(parsed.detractor) || 0,
+        neutro: Number(parsed.neutro) || 0,
+        promotor: Number(parsed.promotor) || 0,
+      })
+    } catch (err) {
+      console.warn('[CSATBreakdown] no se pudo leer mdc_sentiment_avg', err)
+    }
+  }, [])
+
+  const formatValue = (value: number) => `${value.toFixed(1)}%`
+
   const data = [
     {
       label: 'Detractores',
-      value: '59.8%',
+      value: formatValue(averages.detractor),
       color: 'text-destructive',
       fontSize: 'xx-large',
       labelSize: 'large',
       borderBottom: '1px solid #d4d4d4',
     },
-    { label: 'Neutros', 
-      value: '23.3%', 
-      color: 'text-muted',
+    {
+      label: 'Neutros',
+      value: formatValue(averages.neutro),
+      color: 'text-warning',
       fontSize: 'xx-large',
       labelSize: 'large',
       borderBottom: '1px solid #d4d4d4',
     },
     {
       label: 'Promotores',
-      value: '14%',
+      value: formatValue(averages.promotor),
       color: 'text-success',
       fontSize: 'xx-large',
       labelSize: 'large',
@@ -112,7 +136,8 @@ function CSATBreakdown() {
     <Card className="h-full csat-breakdown">
       <CardHeader>
         <CardTitle>Sentiment</CardTitle>
-        <p className="text-xs text-muted">CSAT Inversiones</p>
+        <p className="text-xs text-muted">CSAT Inversiones (comentarios)</p>
+        <br />
       </CardHeader>
       <CardContent className="space-y-4">
         {data.map((item, index) => (
@@ -126,16 +151,119 @@ function CSATBreakdown() {
   );
 }
 
+type CSATOFBRow = {
+  period: string;
+  csat: number;
+  responses: number;
+}
+
 function CSATStackedBar() {
+  const [option, setOption] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const url = `src/data/csat_ofb_2025.json?bust=${Date.now()}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`No se pudo cargar ${url} (${res.status})`);
+
+        const rows = (await res.json()) as Array<Record<string, string>>;
+        const normalized: CSATOFBRow[] = rows.map((row) => ({
+          period: String(row['Metadatos de la encuesta - Fecha registrada'] ?? '').trim(),
+          csat: parseFloat(String(row['CSAT'] ?? '0').replace('%', '')) || 0,
+          responses: Number(String(row['Number of responses (CSAT)'] ?? '0').replace(/,/g, '')) || 0,
+        })).filter((row) => !!row.period);
+
+        if (!normalized.length) throw new Error('Dataset csat_ofb_2025 vacío');
+
+        const labels = normalized.map((row) => row.period);
+        const csatSeries = normalized.map((row) => Number(row.csat.toFixed(1)));
+
+        const maxResponses = Math.max(...normalized.map((row) => row.responses), 1);
+        const responsesScaled = normalized.map((row) => Number(((row.responses / maxResponses) * 100).toFixed(1)));
+        const rawResponses = normalized.map((row) => row.responses);
+
+        setOption({
+          color: ['#1d4ed8', '#60a5fa'],
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'cross' },
+            formatter: (params: any[]) => {
+              if (!params?.length) return '';
+              const idx = params[0].dataIndex;
+              const parts = [`<strong>${labels[idx]}</strong>`];
+              params.forEach((p) => {
+                if (p.seriesName === 'CSAT') {
+                  parts.push(`${p.marker} ${p.seriesName}: ${csatSeries[idx]}%`);
+                } else {
+                  const responsesFmt = rawResponses[idx].toLocaleString('es-AR');
+                  parts.push(`${p.marker} ${p.seriesName}: ${responsesFmt} resp.`);
+                }
+              });
+              return parts.join('<br/>');
+            },
+          },
+          legend: { data: ['CSAT', 'Respuestas (esc.)'] },
+          grid: { left: 48, right: 24, top: 40, bottom: 40 },
+          xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: labels,
+            axisLabel: { rotate: 0 },
+          },
+          yAxis: {
+            type: 'value',
+            axisLabel: { formatter: '{value}%' },
+            min: 0,
+            max: (value: { max: number }) => Math.min(120, Math.ceil(value.max / 10) * 10),
+          },
+          series: [
+            {
+              name: 'CSAT',
+              type: 'line',
+              stack: 'total',
+              smooth: true,
+              symbolSize: 6,
+              areaStyle: { opacity: 0.35 },
+              emphasis: { focus: 'series' },
+              data: csatSeries,
+            },
+            {
+              name: 'Respuestas (esc.)',
+              type: 'line',
+              stack: 'total',
+              smooth: true,
+              symbolSize: 6,
+              areaStyle: { opacity: 0.2 },
+              emphasis: { focus: 'series' },
+              data: responsesScaled,
+            },
+          ],
+        });
+        setError(null);
+      } catch (err: any) {
+        console.error('[CSATStackedBar] error', err);
+        setError(err?.message || 'Error al cargar csat_ofb_2025.json');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>CSAT Stacked Bar</CardTitle>
+        <CardTitle>CSAT vs respuestas</CardTitle>
       </CardHeader>
-      <CardContent className="flex items-center justify-center py-24">
-        <p className="text-muted">
-          Espacio reservado para comparar ambos CSATs
-        </p>
+      <CardContent className="flex items-center justify-center py-4">
+        {loading && <div className="text-sm opacity-70">Cargando…</div>}
+        {!loading && error && <div className="text-sm text-destructive whitespace-pre-wrap">{error}</div>}
+        {!loading && !error && option && (
+          <ReactECharts option={option} style={{ height: 280, width: '100%' }} notMerge lazyUpdate />
+        )}
       </CardContent>
     </Card>
   );

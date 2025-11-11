@@ -694,6 +694,14 @@
     color: var(--foreground);
   }
 
+  .text-warning {
+    color: var(--warning);
+  }
+
+  .text-warning-foreground {
+    color: var(--warning-foreground);
+  }
+
   .text-muted {
     color: var(--muted);
   }
@@ -1038,6 +1046,8 @@
   --accent-foreground: #fff;
   --destructive: #c51111;
   --destructive-foreground: #fff;
+  --warning: #f59e0b;
+  --warning-foreground: #fff;
   --success: #16a34a;
   --success-foreground: #fff; 
   --border: #e6e6e6;
@@ -1072,6 +1082,10 @@
   --primary-foreground: #fff;
   --secondary: #0000;
   --secondary-foreground: #fa6400;
+  --warning: #f59e0b;
+  --warning-foreground: #fff;
+  --success: #16a34a;
+  --success-foreground: #fff; 
   --muted: #404040;
   --muted-foreground: #aaa;
   --accent: #fa6400;
