@@ -53,7 +53,6 @@ export default function SentimentChart_v095() {
           }
         }
 
-        const leftPx = Math.max(220, Math.min(480, Math.round(Math.max(...agg.labels.map(s => s.length)) * 7)))
         const detrData = agg.detractorPct.map((pct, i) => ({ value: pct, count: agg.detractorAbs[i] }))
         const neutData = agg.neutroPct.map((pct, i) => ({ value: pct, count: agg.neutroAbs[i] }))
         const promData = agg.promotorPct.map((pct, i) => ({ value: pct, count: agg.promotorAbs[i] }))

@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import ReactECharts from 'echarts-for-react';
 import KPIBoard from './features/kpi/KPIBoard';
-
+import ReactECharts from 'echarts-for-react';
 import SentimentChart_v093 from '@/features/viz/SentimentChart';
 
 import { Button } from './components/ui/button';
@@ -161,7 +160,6 @@ function CSATStackedBar() {
   const [option, setOption] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     (async () => {
       try {
@@ -169,25 +167,20 @@ function CSATStackedBar() {
         const url = `src/data/csat_ofb_2025.json?bust=${Date.now()}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`No se pudo cargar ${url} (${res.status})`);
-
         const rows = (await res.json()) as Array<Record<string, string>>;
         const normalized: CSATOFBRow[] = rows.map((row) => ({
           period: String(row['Metadatos de la encuesta - Fecha registrada'] ?? '').trim(),
           csat: parseFloat(String(row['CSAT'] ?? '0').replace('%', '')) || 0,
           responses: Number(String(row['Number of responses (CSAT)'] ?? '0').replace(/,/g, '')) || 0,
         })).filter((row) => !!row.period);
-
         if (!normalized.length) throw new Error('Dataset csat_ofb_2025 vacío');
-
         const labels = normalized.map((row) => row.period);
         const csatSeries = normalized.map((row) => Number(row.csat.toFixed(1)));
-
         const maxResponses = Math.max(...normalized.map((row) => row.responses), 1);
         const responsesScaled = normalized.map((row) => Number(((row.responses / maxResponses) * 100).toFixed(1)));
         const rawResponses = normalized.map((row) => row.responses);
-
         setOption({
-          color: ['#1d4ed8', '#60a5fa'],
+          color: ['#fa530bff', '#fec691ff'],
           tooltip: {
             trigger: 'axis',
             axisPointer: { type: 'cross' },
@@ -206,7 +199,7 @@ function CSATStackedBar() {
               return parts.join('<br/>');
             },
           },
-          legend: { data: ['CSAT', 'Respuestas (esc.)'] },
+          legend: { data: ['CSAT', 'Rtas.'] },
           grid: { left: 48, right: 24, top: 40, bottom: 40 },
           xAxis: {
             type: 'category',
@@ -226,17 +219,17 @@ function CSATStackedBar() {
               type: 'line',
               stack: 'total',
               smooth: true,
-              symbolSize: 6,
+              symbolSize: 5,
               areaStyle: { opacity: 0.35 },
               emphasis: { focus: 'series' },
               data: csatSeries,
             },
             {
-              name: 'Respuestas (esc.)',
+              name: 'Rtas.',
               type: 'line',
               stack: 'total',
               smooth: true,
-              symbolSize: 6,
+              symbolSize: 2,
               areaStyle: { opacity: 0.2 },
               emphasis: { focus: 'series' },
               data: responsesScaled,
@@ -252,11 +245,11 @@ function CSATStackedBar() {
       }
     })();
   }, []);
-
+  
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle>CSAT vs respuestas</CardTitle>
+        <CardTitle>CSAT Canal</CardTitle>
       </CardHeader>
       <CardContent className="flex items-center justify-center py-4">
         {loading && <div className="text-sm opacity-70">Cargando…</div>}
@@ -268,6 +261,7 @@ function CSATStackedBar() {
     </Card>
   );
 }
+
 
 function TablePlaceholder() {
   return (
@@ -337,12 +331,12 @@ export default function App() {
             <>
               <KPIBoard />
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-2 fit-content">
                   <SentimentChart_v093 />
                 </div>
                 <div className="space-y-6 fit-content">
-                  <CSATStackedBar />
                   <CSATBreakdown />
+                  <CSATStackedBar />
                 </div>
               </div>
               
