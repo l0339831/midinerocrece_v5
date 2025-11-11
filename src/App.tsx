@@ -21,7 +21,7 @@ function getViewFromHash(): ViewKey {
 function Sidebar({ current, onChange }: { current: ViewKey; onChange: (v: ViewKey) => void }) {
   const navItems: Array<{ id: ViewKey; icon: LucideIcon; label: string }> = [
     { id: 'home', icon: Home, label: 'Inicio' },
-    { id: 'datos', icon: FileText, label: 'Data' },
+    { id: 'datos', icon: FileText, label: 'Diagóstico' },
     { id: 'proyectos', icon: BarChart3, label: 'Proyectos' },
     { id: 'exportar', icon: Sparkles, label: 'Exportar' },
   ];
@@ -267,9 +267,7 @@ function TablePlaceholder() {
   return (
     <Card>
       <CardContent className="flex items-center justify-center py-24">
-        <p className="text-muted-foreground">
-          Espacio reservado para tabla/resumen
-        </p>
+       Diagnóstico de experiencia
       </CardContent>
     </Card>
   );
@@ -344,7 +342,6 @@ export default function App() {
           )}
           {view === 'datos' && (
             <>
-            
             <TablePlaceholder />
             </>
           )}
