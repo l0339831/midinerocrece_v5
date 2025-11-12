@@ -30,9 +30,11 @@ export type Estado =
  * Represents a single row of customer feedback data.
  * Core data structure for the application's bulk editing and categorization features.
  */
+export type RowId = string | number;
+
 export interface Row {
   /** Unique identifier for the row, used as key in IndexedDB */
-  id: string;
+  id: RowId;
 
   /**
    * Original data from imported CSV/JSON file.
@@ -91,4 +93,57 @@ export interface ProjectList {
    * Updated whenever projects are added/removed.
    */
   updatedAt: number;
+}
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> => (
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+);
+
+const cloneRecord = (value: Record<string, unknown>): Record<string, unknown> => ({ ...value });
+
+const generateRowId = (): string => {
+  if (typeof globalThis.crypto?.randomUUID === 'function') {
+    return globalThis.crypto.randomUUID();
+  }
+  return `row-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+};
+
+/**
+ * Runtime type-guard for dataset rows. Ensures critical fields exist before persisting.
+ */
+export function isRow(value: unknown): value is Row {
+  if (!isPlainObject(value)) return false;
+  const candidate = value as Partial<Row>;
+  const hasId =
+    (typeof candidate.id === 'string' && candidate.id.trim().length > 0) ||
+    (typeof candidate.id === 'number' && Number.isFinite(candidate.id));
+  if (!hasId) return false;
+  if (!isPlainObject(candidate.src)) return false;
+  if (!isPlainObject(candidate.workflow)) return false;
+  if ('driver' in candidate && candidate.driver !== undefined && typeof candidate.driver !== 'string') return false;
+  return true;
+}
+
+/**
+ * Normalizes a Row instance by trimming strings and cloning nested records to avoid shared references.
+ */
+export function normalizeRow(input: Row): Row {
+  const normalizedId =
+    typeof input.id === 'number' && Number.isFinite(input.id)
+      ? String(input.id)
+      : typeof input.id === 'string' && input.id.trim().length > 0
+        ? input.id.trim()
+        : generateRowId();
+
+  const driver =
+    typeof input.driver === 'string'
+      ? input.driver.trim()
+      : undefined;
+
+  return {
+    id: normalizedId,
+    src: isPlainObject(input.src) ? cloneRecord(input.src) : {},
+    workflow: isPlainObject(input.workflow) ? cloneRecord(input.workflow) : {},
+    ...(driver ? { driver } : {}),
+  };
 }
