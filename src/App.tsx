@@ -6,6 +6,7 @@ import SentimentChart_v093 from '@/features/viz/SentimentChart';
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Home, BarChart3, Sparkles, Upload, FileText, type LucideIcon } from 'lucide-react';
+import Datos from "./views/Datos";
 
 type ViewKey = 'home' | 'datos' | 'proyectos' | 'exportar';
 
@@ -262,12 +263,11 @@ function CSATStackedBar() {
   );
 }
 
-
 function TablePlaceholder() {
   return (
     <Card>
-      <CardContent className="flex items-center justify-center py-24">
-       Diagnóstico de experiencia
+      <CardContent>
+    <Datos />
       </CardContent>
     </Card>
   );
@@ -324,7 +324,7 @@ export default function App() {
       <div className="ml-16">
         <Header />
 
-        <main className="px-12 py-6 space-y-6">
+        <main className="px-6 py-6 space-y-6">
           {view === 'home' && (
             <>
               <KPIBoard />

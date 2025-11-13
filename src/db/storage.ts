@@ -1,4 +1,3 @@
-
 import Dexie, { Table } from 'dexie'
 
 export interface Project {

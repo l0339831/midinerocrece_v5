@@ -336,6 +336,15 @@
     position: sticky;
   }
 
+  .text-medium {
+  font-size: medium;
+}
+
+.text-small {
+  font-size: small !important;
+  font-weight: var(--font-weight-regular) !important;
+}
+
   .top-0 {
     top: calc(var(--spacing) * 0);
   }
@@ -608,6 +617,10 @@
 
   .px-3 {
     padding-inline: calc(var(--spacing) * 3);
+  }
+
+  .px-cell {
+    padding: calc(var(--spacing) * 3) calc(var(--spacing) * 4);
   }
 
   .px-4 {
