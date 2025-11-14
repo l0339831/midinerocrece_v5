@@ -233,7 +233,7 @@ export default function Datos() {
               <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.cliente}</TableCell>
               <TableCell className="min-w-[320px] whitespace-normal break-words px-cell">{row.comentario}</TableCell>
               <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.driver}</TableCell>
-              <TableCell className="min-w-[320px] whitespace-normal break-words px-cell">{row.dolor}</TableCell>
+              <TableCell className="min-w-[320px] whitespace-normal break-words px-cell text-destructive">{row.dolor}</TableCell>
               <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.recurrencia}</TableCell>
               <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.criticidad}</TableCell>
               <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.prioridad}</TableCell>

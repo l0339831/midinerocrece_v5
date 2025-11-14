@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import KPIBoard from './features/kpi/KPIBoard';
 import ReactECharts from 'echarts-for-react';
 import SentimentChart_v093 from '@/features/viz/SentimentChart';
+import BulkEditor from '@/features/table/BulkEditor';
 
 import { Button } from './components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Home, BarChart3, Sparkles, Upload, FileText, type LucideIcon } from 'lucide-react';
 import Datos from "./views/Datos";
 
@@ -341,9 +343,18 @@ export default function App() {
             </>
           )}
           {view === 'datos' && (
-            <>
-            <TablePlaceholder />
-            </>
+            <Tabs defaultValue="tabla" className="space-y-4">
+              <TabsList>
+                <TabsTrigger value="tabla">Diagóstico de Experiencia</TabsTrigger>
+                <TabsTrigger value="bulk">Editar</TabsTrigger>
+              </TabsList>
+              <TabsContent value="tabla" className="space-y-4">
+                <TablePlaceholder />
+              </TabsContent>
+              <TabsContent value="bulk">
+                <BulkEditor />
+              </TabsContent>
+            </Tabs>
           )}
           {view === 'proyectos' && (
             <ViewPlaceholder title="Proyectos" description="Esta vista listará y administrará proyectos." />
