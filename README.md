@@ -30,7 +30,6 @@ Esta versión mantiene la **misma arquitectura** validada en iteraciones anterio
 - **React 18** + **TypeScript**
 - **IndexedDB (Dexie)** para persistencia local
 - **UI components** (wrappers en `src/components/ui/*`)
-- **Sin nuevas hojas de estilo**: se utilizan las ya incluidas en el proyecto
 
 ---
 
@@ -127,8 +126,7 @@ La app usa **IndexedDB** mediante **Dexie**. Los helpers viven en `src/data/stor
 ## Estilos
 
 - **No se agregan nuevas hojas de estilo**.  
-- Se reutilizan `src/index.css` y `src/styles/globals.css` (tokens/variables/utilidades).  
-- Los componentes UI ya incluyen las clases/utilidades necesarias.
+- Se reutilizan `src/index.css` y `src/styles/globals.css` (tokens/variables/utilidades). 
 
 ---
 

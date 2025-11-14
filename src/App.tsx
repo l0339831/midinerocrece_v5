@@ -343,15 +343,15 @@ export default function App() {
             </>
           )}
           {view === 'datos' && (
-            <Tabs defaultValue="tabla" className="space-y-4">
+            <Tabs defaultValue="diagnostico" className="space-y-4">
               <TabsList>
-                <TabsTrigger value="tabla">Diagóstico de Experiencia</TabsTrigger>
-                <TabsTrigger value="bulk">Editar</TabsTrigger>
+                <TabsTrigger value="diagnostico">Diagóstico de Experiencia</TabsTrigger>
+                <TabsTrigger value="editor">Editar</TabsTrigger>
               </TabsList>
-              <TabsContent value="tabla" className="space-y-4">
+              <TabsContent value="diagnostico" className="space-y-4">
                 <TablePlaceholder />
               </TabsContent>
-              <TabsContent value="bulk">
+              <TabsContent value="editor">
                 <BulkEditor />
               </TabsContent>
             </Tabs>
