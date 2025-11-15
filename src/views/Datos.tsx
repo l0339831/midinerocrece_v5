@@ -1,7 +1,15 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { db, type Driver, type Project, type Status } from '@/db/storage';
 
 type SortColumn = 'driver' | 'proyecto' | 'estado';
 
@@ -21,53 +29,142 @@ type DatosRow = {
 const SAMPLE_ROWS: DatosRow[] = [
   {
     id: 'row-1',
-    cliente: 'Renta Media',
+    cliente: 'Renta Alta',
     comentario:
       'La app tarda demasiado en mostrar el histórico de rentabilidad y termina forzando a entrar en la web. Necesito descargar reportes largos con filtros por fecha.',
-    driver: 'Experiencia App inversiones',
+    driver: 'Blanqueo',
     dolor: 'No puedo descargar el histórico completo de rentabilidad ni reportes extendidos',
     recurrencia: 'Alta',
     criticidad: 'Media',
     prioridad: 'Media',
-    proyecto: 'Análisis App inversiones',
-    estado: 'En desarrollo',
+    proyecto: 'Overview SPA',
+    estado: 'En Diseño',
   },
   {
     id: 'row-2',
-    cliente: 'Renta Alta',
+    cliente: 'PYME MICRO',
     comentario:
       'Cuando cargamos archivos CSV con más de 500 filas el sistema se cuelga y hay que reiniciar toda la sesión. Esto afecta la conciliación mensual de múltiples países.',
-    driver: 'Carga de archivos masivos',
+    driver: 'Establidad',
     dolor: 'Imposible importar CSV largos sin reiniciar la sesión completa',
     recurrencia: 'Baja',
     criticidad: 'Alta',
     prioridad: 'Alta',
-    proyecto: 'Carga CSV regional',
-    estado: 'En Backlog de tribu',
+    proyecto: 'Overview SPA',
+    estado: 'En Backlog',
   },
   {
     id: 'row-3',
     cliente: 'Renta Baja',
     comentario:
       'Los agentes no pueden reasignar casos cuando el workflow queda bloqueado por validaciones de datos replicados. Es un proceso ruidoso con reclamos internos.',
-    driver: 'Workflow CX',
+    driver: 'CVT MEP',
     dolor: 'No hay mecanismo de desbloqueo rápido cuando el workflow queda invalidado',
     recurrencia: 'Alta',
     criticidad: 'Media',
     prioridad: 'Media',
-    proyecto: 'Desbloqueo workflow CX',
+    proyecto: 'Overview SPA',
     estado: 'Se hizo EQC',
   },
 ];
 
+const RECURRENCIA_OPTIONS = ['Alta', 'Media', 'Baja'] as const;
+const CRITICIDAD_OPTIONS = ['Alta', 'Media', 'Baja'] as const;
+
+type RentaBucket = 'ALTA' | 'MEDIA' | 'BAJA';
+
+function getRentaBucketFromCliente(cliente: string): RentaBucket {
+  const normalized = cliente.trim().toUpperCase();
+
+  if (
+    normalized === 'RENTA ALTA' ||
+    normalized === 'PYME PES' ||
+    normalized === 'AGRO GRANDES' ||
+    normalized === 'EMPRESAS'
+  ) {
+    return 'ALTA';
+  }
+
+  if (
+    normalized === 'RENTA MEDIA' ||
+    normalized === 'PYME MICRO' ||
+    normalized === 'AGRO PES'
+  ) {
+    return 'MEDIA';
+  }
+
+  return 'BAJA';
+}
+
+function computePrioridadFromClienteAndCriticidad(cliente: string, criticidad: string): 'Alta' | 'Media' | 'Baja' {
+  const rentaBucket = getRentaBucketFromCliente(cliente);
+  const critNorm = criticidad.trim().toLowerCase();
+
+  switch (rentaBucket) {
+    case 'ALTA':
+      if (critNorm === 'alta') return 'Alta';
+      if (critNorm === 'media') return 'Alta';
+      if (critNorm === 'baja') return 'Media';
+      break;
+    case 'MEDIA':
+      if (critNorm === 'alta') return 'Alta';
+      if (critNorm === 'media') return 'Media';
+      if (critNorm === 'baja') return 'Baja';
+      break;
+    case 'BAJA':
+      if (critNorm === 'alta') return 'Media';
+      if (critNorm === 'media') return 'Baja';
+      if (critNorm === 'baja') return 'Baja';
+      break;
+  }
+
+  return 'Media';
+}
+
 export default function Datos() {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
-  const rows = useMemo(() => SAMPLE_ROWS, []);
+  const [rows, setRows] = useState<DatosRow[]>(SAMPLE_ROWS);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<{ column: SortColumn; direction: 'asc' | 'desc' }>({
     column: 'driver',
     direction: 'asc',
   });
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [statuses, setStatuses] = useState<Status[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await db.drivers.toArray();
+        setDrivers(list);
+      } catch (error) {
+        console.error('[Datos] no se pudieron cargar drivers', error);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await db.projects.toArray();
+        setProjects(list);
+      } catch (error) {
+        console.error('[Datos] no se pudieron cargar proyectos', error);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await db.statuses.toArray();
+        setStatuses(list);
+      } catch (error) {
+        console.error('[Datos] no se pudieron cargar estados', error);
+      }
+    })();
+  }, []);
 
   const filteredRows = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -138,6 +235,44 @@ export default function Datos() {
   const renderSortIndicator = (column: SortColumn) => {
     if (sort.column !== column) return '↕';
     return sort.direction === 'asc' ? '↑' : '↓';
+  };
+
+  const handleChangeDriver = (rowId: string, newDriverName: string) => {
+    setRows((prev) =>
+      prev.map((row) => (row.id === rowId ? { ...row, driver: newDriverName } : row))
+    );
+  };
+
+  const handleChangeRecurrencia = (rowId: string, newRecurrencia: string) => {
+    setRows((prev) =>
+      prev.map((row) => (row.id === rowId ? { ...row, recurrencia: newRecurrencia } : row))
+    );
+  };
+
+  const handleChangeCriticidad = (rowId: string, newCriticidad: string) => {
+    setRows((prev) =>
+      prev.map((row) => {
+        if (row.id !== rowId) return row;
+        const nuevaPrioridad = computePrioridadFromClienteAndCriticidad(row.cliente, newCriticidad);
+        return {
+          ...row,
+          criticidad: newCriticidad,
+          prioridad: nuevaPrioridad,
+        };
+      })
+    );
+  };
+
+  const handleChangeProyecto = (rowId: string, newProyecto: string) => {
+    setRows((prev) =>
+      prev.map((row) => (row.id === rowId ? { ...row, proyecto: newProyecto } : row))
+    );
+  };
+
+  const handleChangeEstado = (rowId: string, newEstado: string) => {
+    setRows((prev) =>
+      prev.map((row) => (row.id === rowId ? { ...row, estado: newEstado } : row))
+    );
   };
 
   return (
@@ -232,13 +367,110 @@ export default function Datos() {
               </TableCell>
               <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.cliente}</TableCell>
               <TableCell className="min-w-[320px] whitespace-normal break-words px-cell">{row.comentario}</TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.driver}</TableCell>
+              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                <Select
+                  value={row.driver || ''}
+                  onValueChange={(value) => handleChangeDriver(row.id, value)}
+                  disabled={drivers.length === 0}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue
+                      placeholder={
+                        drivers.length === 0
+                          ? 'Configurar drivers en la otra pestaña'
+                          : 'Sin completar'
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {drivers.map((driver) => (
+                      <SelectItem key={driver.id ?? driver.name} value={driver.name}>
+                        {driver.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
               <TableCell className="min-w-[320px] whitespace-normal break-words px-cell text-destructive">{row.dolor}</TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.recurrencia}</TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.criticidad}</TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.prioridad}</TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.proyecto}</TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.estado}</TableCell>
+              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                <Select
+                  value={row.recurrencia || ''}
+                  onValueChange={(value) => handleChangeRecurrencia(row.id, value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sin asignar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RECURRENCIA_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                <Select
+                  value={row.criticidad || ''}
+                  onValueChange={(value) => handleChangeCriticidad(row.id, value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sin asignar" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CRITICIDAD_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell text-medium"><b>{row.prioridad}</b></TableCell>
+              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                <Select
+                  value={row.proyecto || ''}
+                  onValueChange={(value) => handleChangeProyecto(row.id, value)}
+                  disabled={projects.length === 0}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue
+                      placeholder={
+                        projects.length === 0 ? 'Configurar proyectos en la otra pestaña' : 'Sin completar'
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projects.map((project) => (
+                      <SelectItem key={project.id ?? project.name} value={project.name}>
+                        {project.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
+              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                <Select
+                  value={row.estado || ''}
+                  onValueChange={(value) => handleChangeEstado(row.id, value)}
+                  disabled={statuses.length === 0}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue
+                      placeholder={
+                        statuses.length === 0 ? 'Configurar estados en la otra pestaña' : 'Sin completar'
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {statuses.map((status) => (
+                      <SelectItem key={status.id ?? status.name} value={status.name}>
+                        {status.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
