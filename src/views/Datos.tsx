@@ -293,7 +293,7 @@ export default function Datos() {
         </p>
       </div>
 
-      <Table className="min-w-[960px]">
+      <Table id='diagnosticoTable' className="min-w-[960px]">
         <TableHeader>
           <TableRow>
             <TableHead className={`w-12`}>
