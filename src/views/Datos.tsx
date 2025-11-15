@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   Select,
   SelectContent,
@@ -294,7 +294,6 @@ export default function Datos() {
       </div>
 
       <Table className="min-w-[960px]">
-        <TableCaption>Vista previa de dataset activo (10 columnas)</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead className={`w-12`}>
