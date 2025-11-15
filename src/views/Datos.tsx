@@ -10,63 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { db, type Driver, type Project, type Status } from '@/db/storage';
-
-type SortColumn = 'driver' | 'proyecto' | 'estado';
-
-type DatosRow = {
-  id: string;
-  cliente: string;
-  comentario: string;
-  driver: string;
-  dolor: string;
-  recurrencia: string;
-  criticidad: string;
-  prioridad: string;
-  proyecto: string;
-  estado: string;
-};
-
-const SAMPLE_ROWS: DatosRow[] = [
-  {
-    id: 'row-1',
-    cliente: 'Renta Alta',
-    comentario:
-      'La app tarda demasiado en mostrar el histórico de rentabilidad y termina forzando a entrar en la web. Necesito descargar reportes largos con filtros por fecha.',
-    driver: 'Blanqueo',
-    dolor: 'No puedo descargar el histórico completo de rentabilidad ni reportes extendidos',
-    recurrencia: 'Alta',
-    criticidad: 'Media',
-    prioridad: 'Media',
-    proyecto: 'Overview SPA',
-    estado: 'En Diseño',
-  },
-  {
-    id: 'row-2',
-    cliente: 'PYME MICRO',
-    comentario:
-      'Cuando cargamos archivos CSV con más de 500 filas el sistema se cuelga y hay que reiniciar toda la sesión. Esto afecta la conciliación mensual de múltiples países.',
-    driver: 'Establidad',
-    dolor: 'Imposible importar CSV largos sin reiniciar la sesión completa',
-    recurrencia: 'Baja',
-    criticidad: 'Alta',
-    prioridad: 'Alta',
-    proyecto: 'Overview SPA',
-    estado: 'En Backlog',
-  },
-  {
-    id: 'row-3',
-    cliente: 'Renta Baja',
-    comentario:
-      'Los agentes no pueden reasignar casos cuando el workflow queda bloqueado por validaciones de datos replicados. Es un proceso ruidoso con reclamos internos.',
-    driver: 'CVT MEP',
-    dolor: 'No hay mecanismo de desbloqueo rápido cuando el workflow queda invalidado',
-    recurrencia: 'Alta',
-    criticidad: 'Media',
-    prioridad: 'Media',
-    proyecto: 'Overview SPA',
-    estado: 'Se hizo EQC',
-  },
-];
+import { useDiagnosticoStore, type DatosRow, type SortColumn } from '@/features/datos/diagnosticoStore';
 
 const RECURRENCIA_OPTIONS = ['Alta', 'Media', 'Baja'] as const;
 const CRITICIDAD_OPTIONS = ['Alta', 'Media', 'Baja'] as const;
@@ -123,7 +67,8 @@ function computePrioridadFromClienteAndCriticidad(cliente: string, criticidad: s
 
 export default function Datos() {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
-  const [rows, setRows] = useState<DatosRow[]>(SAMPLE_ROWS);
+  const rows = useDiagnosticoStore((state) => state.rows);
+  const setRows = useDiagnosticoStore((state) => state.setRows);
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<{ column: SortColumn; direction: 'asc' | 'desc' }>({
     column: 'driver',

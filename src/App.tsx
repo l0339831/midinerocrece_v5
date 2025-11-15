@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Home, BarChart3, Sparkles, Upload, FileText, type LucideIcon } from 'lucide-react';
 import Datos from "./views/Datos";
+import Proyectos from "./views/Proyectos";
 
 type ViewKey = 'home' | 'datos' | 'proyectos' | 'exportar';
 
@@ -357,7 +358,7 @@ export default function App() {
             </Tabs>
           )}
           {view === 'proyectos' && (
-            <ViewPlaceholder title="Proyectos" description="Esta vista listará y administrará proyectos." />
+            <Proyectos />
           )}
           {view === 'exportar' && (
             <ViewPlaceholder title="Exportar" description="Esta vista contendrá flujos y reportes de exportación." />
