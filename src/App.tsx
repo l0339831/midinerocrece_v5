@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import KPIBoard from './features/kpi/KPIBoard';
 import ReactECharts from 'echarts-for-react';
-import SentimentChart_v093 from '@/features/viz/SentimentChart';
+import SentimentChart_v095 from '@/features/viz/SentimentChart';
 import BulkEditor from '@/features/table/BulkEditor';
 
 import { Button } from './components/ui/button';
@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
 import { Home, BarChart3, Sparkles, Upload, FileText, type LucideIcon } from 'lucide-react';
 import Datos from "./views/Datos";
 import Proyectos from "./views/Proyectos";
+import DesignCollabRadar, { TeamProjectsData } from "./viz/DesignCollabRadar";
+
 
 type ViewKey = 'home' | 'datos' | 'proyectos' | 'exportar';
 
@@ -136,7 +138,7 @@ function CSATBreakdown() {
   ];
 
   return (
-    <Card className="h-full csat-breakdown">
+    <Card className="csat-breakdown fit-content">
       <CardHeader>
         <CardTitle>Sentiment</CardTitle>
         <p className="text-xs text-muted">CSAT Inversiones (comentarios)</p>
@@ -320,6 +322,15 @@ export default function App() {
     }
   };
 
+  const squads: TeamProjectsData[] = [
+    { name: 'Custodia', count: 5},
+    { name: 'Plazo Fijo', count: 3 },
+    { name: 'G Securities', count: 1 },
+    { name: 'FIMA', count: 4 },
+    { name: 'Títulos', count: 2 },
+    { name: 'Dinero', count: 1 },
+  ];  
+
   return (
     <div className="min-h-screen bg-background">
       <Sidebar current={view} onChange={handleViewChange} />
@@ -331,18 +342,28 @@ export default function App() {
           {view === 'home' && (
             <>
               <KPIBoard />
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 fit-content">
-                  <SentimentChart_v093 />
-                </div>
-                <div className="space-y-6 fit-content">
-                  <CSATBreakdown />
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                {/* Columna izquierda (2/3): CSAT + Sentiment + Breakdown */}
+                <div className="lg:col-span-2 space-y-6">
                   <CSATStackedBar />
+                  {/* Sentiment + Breakdown lado a lado */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <SentimentChart_v095 />
+                    <CSATBreakdown />
+                  </div>
+                </div>
+
+                {/* Columna derecha (1/3): Radar */}
+                <div className="space-y-6">
+                  <DesignCollabRadar data={squads} />
                 </div>
               </div>
-              
             </>
           )}
+
+
+
           {view === 'datos' && (
             <Tabs defaultValue="diagnostico" className="space-y-4">
               <TabsList>
