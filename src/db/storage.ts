@@ -33,11 +33,17 @@ export interface Status {
   name: string
 }
 
+export interface Product {
+  id?: number
+  name: string
+}
+
 export class MDCDB extends Dexie {
   dataset!: Table<Row, number>
   projects!: Table<Project, number>
   drivers!: Table<Driver, number>
   statuses!: Table<Status, number>
+  products!: Table<Product, number>
 
   constructor() {
     super('mdc_v3_5_0')
@@ -55,6 +61,13 @@ export class MDCDB extends Dexie {
       projects: '++id,name',
       drivers: '++id,name',
       statuses: '++id,name',
+    })
+    this.version(4).stores({
+      dataset: '++id,date,mes,categoria,banca,segmento_cx,Estados,driver,Proyecto',
+      projects: '++id,name',
+      drivers: '++id,name',
+      statuses: '++id,name',
+      products: '++id,name',
     })
   }
 }

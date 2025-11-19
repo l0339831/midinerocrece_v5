@@ -1,10 +1,11 @@
 import { create } from 'zustand';
 
-export type SortColumn = 'squad' | 'driver' | 'proyecto' | 'estado';
+export type SortColumn = 'squad' | 'producto' | 'driver' | 'proyecto' | 'estado';
 
 export type DatosRow = {
   id: string;
   cliente: string;
+  producto: string;
   canal: string;
   squad: string;
   comentario: string;
@@ -22,6 +23,7 @@ export const SAMPLE_ROWS: DatosRow[] = [
   {
     id: 'row-1',
     cliente: 'Renta Media',
+    producto: '',
     canal: '',
     squad: '',
     comentario:
@@ -38,6 +40,7 @@ export const SAMPLE_ROWS: DatosRow[] = [
   {
     id: 'row-2',
     cliente: 'Renta Alta',
+    producto: '',
     canal: '',
     squad: '',
     comentario:
@@ -54,6 +57,7 @@ export const SAMPLE_ROWS: DatosRow[] = [
   {
     id: 'row-3',
     cliente: 'Renta Baja',
+    producto: '',
     canal: '',
     squad: '',
     comentario:

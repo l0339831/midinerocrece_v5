@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { db, type Driver, type Project, type Status } from '@/db/storage';
+import { db, type Driver, type Project, type Status, type Product } from '@/db/storage';
 
 export default function BulkEditor() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
@@ -22,6 +22,8 @@ export default function BulkEditor() {
   const [statuses, setStatuses] = useState<Status[]>([]);
   const [newStatusName, setNewStatusName] = useState('');
   const [isSavingStatus, setIsSavingStatus] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [newProductName, setNewProductName] = useState('');
 
   const loadDrivers = useCallback(async () => {
     try {
@@ -49,12 +51,21 @@ export default function BulkEditor() {
       console.error('[BulkEditor] no se pudieron cargar estados', error);
     }
   }, []);
+  const loadProducts = useCallback(async () => {
+    try {
+      const rows = await db.products.orderBy('name').toArray();
+      setProducts(rows);
+    } catch (error) {
+      console.error('[BulkEditor] no se pudieron cargar productos', error);
+    }
+  }, []);
 
   useEffect(() => {
     loadDrivers();
     loadProjects();
     loadStatuses();
-  }, [loadDrivers, loadProjects, loadStatuses]);
+    loadProducts();
+  }, [loadDrivers, loadProjects, loadStatuses, loadProducts]);
 
   const handleAddDriver = async () => {
     const trimmed = newDriverName.trim();
@@ -128,6 +139,27 @@ export default function BulkEditor() {
       await loadStatuses();
     } catch (error) {
       console.error('[BulkEditor] error al eliminar estado', error);
+    }
+  };
+  const handleAddProduct = async () => {
+    const trimmed = newProductName.trim();
+    if (!trimmed) return;
+    try {
+      const id = await db.products.add({ name: trimmed });
+      setProducts((prev) => [...prev, { id, name: trimmed }]);
+      setNewProductName('');
+    } catch (error) {
+      console.error('[BulkEditor] error al agregar producto', error);
+    }
+  };
+
+  const handleDeleteProduct = async (id?: number) => {
+    if (id == null) return;
+    try {
+      await db.products.delete(id);
+      setProducts((prev) => prev.filter((product) => product.id !== id));
+    } catch (error) {
+      console.error('[BulkEditor] error al eliminar producto', error);
     }
   };
 
@@ -234,6 +266,69 @@ export default function BulkEditor() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteDriver(driver.id)}
+                        >
+                          Eliminar
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="space-y-1">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Productos</h3>
+            <p className="text-xs text-muted-foreground">
+              Lista maestra usada en la columna &ldquo;Productos&rdquo; del diagnóstico.
+            </p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="new-product">Nuevo producto</Label>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Input
+                id="new-product"
+                placeholder="Ej: Plazo Fijo, Cuenta FIMA, GSec..."
+                value={newProductName}
+                onChange={(event) => setNewProductName(event.target.value)}
+              />
+              <Button
+                onClick={handleAddProduct}
+                disabled={!newProductName.trim()}
+                className="shrink-0 sm:w-auto"
+              >
+                Agregar
+              </Button>
+            </div>
+          </div>
+          <div>
+            {products.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Todavía no hay productos configurados. Agregá el primero arriba.
+              </p>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-20">ID</TableHead>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead className="w-32 text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {products.map((product) => (
+                    <TableRow key={product.id ?? product.name}>
+                      <TableCell className="font-mono text-xs text-muted-foreground">
+                        {typeof product.id === 'number' ? product.id : '—'}
+                      </TableCell>
+                      <TableCell className="font-medium">{product.name}</TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteProduct(product.id)}
                         >
                           Eliminar
                         </Button>

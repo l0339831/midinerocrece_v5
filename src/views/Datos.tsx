@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { db, type Driver, type Project, type Status } from '@/db/storage';
+import { db, type Driver, type Project, type Status, type Product } from '@/db/storage';
 import { useDiagnosticoStore, type SortColumn } from '@/features/datos/diagnosticoStore';
 
 const CLIENTE_OPTIONS = [
@@ -97,6 +97,7 @@ export default function Datos() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -132,6 +133,17 @@ export default function Datos() {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await db.products.toArray();
+        setProducts(list);
+      } catch (error) {
+        console.error('[Datos] no se pudieron cargar productos', error);
+      }
+    })();
+  }, []);
+
   const fuenteOptions = useMemo(() => {
     const set = new Set<string>();
     BASE_FUENTES.forEach((item) => set.add(item));
@@ -148,6 +160,7 @@ export default function Datos() {
     return rows.filter((row) => {
       const haystack = [
         row.cliente,
+        row.producto,
         row.canal,
         row.squad,
         row.comentario,
@@ -234,6 +247,12 @@ export default function Datos() {
           prioridad: nuevaPrioridad,
         };
       })
+    );
+  };
+
+  const handleChangeProducto = (rowId: string, newProducto: string) => {
+    setRows((prev) =>
+      prev.map((row) => (row.id === rowId ? { ...row, producto: newProducto } : row))
     );
   };
 
@@ -348,6 +367,18 @@ export default function Datos() {
               />
             </TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal break-words`}><b className='px-3 text-medium'>Cliente</b></TableHead>
+            <TableHead className={`min-w-[220px] whitespace-normal break-words`}>
+              <button
+                type="button"
+                onClick={() => toggleSort('producto')}
+                className="gap-1 px-3"
+              >
+                <b className='text-medium'>Productos</b>
+                <span aria-hidden="true" className="text-xs px-2">
+                  {renderSortIndicator('producto')}
+                </span>
+              </button>
+            </TableHead>
             <TableHead className={`min-w-[160px] whitespace-normal break-words`}><b className='text-medium'>Canal</b></TableHead>
             <TableHead className={`min-w-[200px] whitespace-normal break-words`}>
               <button
@@ -406,7 +437,7 @@ export default function Datos() {
           <TableBody>
             {visibleRows.length === 0 && (
             <TableRow>
-              <TableCell colSpan={12} className="text-destructive text-center">
+              <TableCell colSpan={13} className="text-destructive text-center">
                 No se encontraron filas que coincidan con “{query.trim()}”.
               </TableCell>
             </TableRow>
@@ -439,6 +470,30 @@ export default function Datos() {
                     list="cliente-options"
                     placeholder="Ej: Renta Alta, PYME PES..."
                   />
+                </TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                  <Select
+                    value={row.producto || ''}
+                    onValueChange={(value) => handleChangeProducto(row.id, value)}
+                    disabled={products.length === 0}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        placeholder={
+                          products.length === 0
+                            ? 'Configurar productos en la otra pestaña'
+                            : 'Sin completar'
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {products.map((product) => (
+                        <SelectItem key={product.id ?? product.name} value={product.name}>
+                          {product.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
                 <TableCell className="min-w-[160px] whitespace-normal break-words px-cell">
                   <Input
@@ -573,17 +628,15 @@ export default function Datos() {
               </TableRow>
               {expandedRows[row.id] && (
                 <TableRow>
-                  <TableCell colSpan={12} className="px-8 py-4">
-                    <div className="space-y-4 p-6">
+                  <TableCell colSpan={13} className="px-8 py-4">
+                    <div className="space-y-4 p-6 table-details-bg">
                       <div>
-                        <p className="text-xs"><b>Comentario:</b></p>
-                        <p className="text-sm whitespace-pre-wrap">
+                        <p className="text-xs whitespace-pre-wrap"><b>💬 Comentario: </b>
                           {row.comentario || 'Sin comentario registrado.'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs"><b>Dolor:</b></p>
-                        <p className="text-sm whitespace-pre-wrap text-destructive">
+                        <p className="text-xs text-destructive whitespace-pre-wrap"><b>🌶️ Dolor: </b> 
                           {row.dolor || 'Sin dolor registrado.'}
                         </p>
                       </div>

@@ -1209,6 +1209,11 @@ input {
   overflow-x: auto;
 }
 
+.table-details-bg {
+  background: #fcedf4;
+  background: radial-gradient(circle, rgba(252, 237, 244, 1) 0%, rgba(255, 255, 255, 1) 100%);
+} 
+
 html {
   font-size: var(--font-size);
 }
