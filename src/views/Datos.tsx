@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -10,10 +10,30 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { db, type Driver, type Project, type Status } from '@/db/storage';
-import { useDiagnosticoStore, type DatosRow, type SortColumn } from '@/features/datos/diagnosticoStore';
+import { useDiagnosticoStore, type SortColumn } from '@/features/datos/diagnosticoStore';
 
+const CLIENTE_OPTIONS = [
+  'Renta Alta',
+  'Renta Media',
+  'Renta Baja',
+  'PYME PES',
+  'PYME MICRO',
+  'AGRO PES',
+  'AGRO GRANDES',
+  'EMPRESAS',
+] as const;
 const RECURRENCIA_OPTIONS = ['Alta', 'Media', 'Baja'] as const;
 const CRITICIDAD_OPTIONS = ['Alta', 'Media', 'Baja'] as const;
+const CANAL_OPTIONS = ['ONB', 'OFB', 'App', 'App Mayo'] as const;
+const SQUAD_OPTIONS = ['Custodia', 'Cambios y GSEC ', 'FIMA', 'Títulos', 'Dinero'] as const;
+const BASE_FUENTES = [
+  'Entrevistas 1:1',
+  'Encuestas',
+  'Analytics',
+  'Hotjar',
+  'Feedback interno',
+  'Workshop',
+] as const;
 
 type RentaBucket = 'ALTA' | 'MEDIA' | 'BAJA';
 
@@ -77,6 +97,7 @@ export default function Datos() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [statuses, setStatuses] = useState<Status[]>([]);
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     (async () => {
@@ -111,13 +132,26 @@ export default function Datos() {
     })();
   }, []);
 
+  const fuenteOptions = useMemo(() => {
+    const set = new Set<string>();
+    BASE_FUENTES.forEach((item) => set.add(item));
+    rows.forEach((row) => {
+      const val = row.fuente?.trim();
+      if (val) set.add(val);
+    });
+    return Array.from(set);
+  }, [rows]);
+
   const filteredRows = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) return rows;
     return rows.filter((row) => {
       const haystack = [
         row.cliente,
+        row.canal,
+        row.squad,
         row.comentario,
+        row.fuente,
         row.driver,
         row.dolor,
         row.recurrencia,
@@ -168,6 +202,13 @@ export default function Datos() {
     });
   };
 
+  const toggleRowExpanded = (rowId: string) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [rowId]: !prev[rowId],
+    }));
+  };
+
   const toggleSort = (column: SortColumn) => {
     setSort((prev) => {
       if (prev.column !== column) {
@@ -182,6 +223,32 @@ export default function Datos() {
     return sort.direction === 'asc' ? '↑' : '↓';
   };
 
+  const handleChangeCliente = (rowId: string, newCliente: string) => {
+    setRows((prev) =>
+      prev.map((row) => {
+        if (row.id !== rowId) return row;
+        const nuevaPrioridad = computePrioridadFromClienteAndCriticidad(newCliente, row.criticidad ?? '');
+        return {
+          ...row,
+          cliente: newCliente,
+          prioridad: nuevaPrioridad,
+        };
+      })
+    );
+  };
+
+  const handleChangeSquad = (rowId: string, newSquad: string) => {
+    setRows((prev) =>
+      prev.map((row) => (row.id === rowId ? { ...row, squad: newSquad } : row))
+    );
+  };
+
+  const handleChangeCanal = (rowId: string, newCanal: string) => {
+    setRows((prev) =>
+      prev.map((row) => (row.id === rowId ? { ...row, canal: newCanal } : row))
+    );
+  };
+
   const handleChangeDriver = (rowId: string, newDriverName: string) => {
     setRows((prev) =>
       prev.map((row) => (row.id === rowId ? { ...row, driver: newDriverName } : row))
@@ -191,6 +258,12 @@ export default function Datos() {
   const handleChangeRecurrencia = (rowId: string, newRecurrencia: string) => {
     setRows((prev) =>
       prev.map((row) => (row.id === rowId ? { ...row, recurrencia: newRecurrencia } : row))
+    );
+  };
+
+  const handleChangeFuente = (rowId: string, newFuente: string) => {
+    setRows((prev) =>
+      prev.map((row) => (row.id === rowId ? { ...row, fuente: newFuente } : row))
     );
   };
 
@@ -238,9 +311,35 @@ export default function Datos() {
         </p>
       </div>
 
-      <Table id='diagnosticoTable' className="min-w-[960px]">
-        <TableHeader>
-          <TableRow>
+      <datalist id="cliente-options">
+        {CLIENTE_OPTIONS.map((option) => (
+          <option key={option} value={option} />
+        ))}
+      </datalist>
+
+      <datalist id="canal-options">
+        {CANAL_OPTIONS.map((option) => (
+          <option key={option} value={option} />
+        ))}
+      </datalist>
+
+      <datalist id="squad-options">
+        {SQUAD_OPTIONS.map((option) => (
+          <option key={option} value={option} />
+        ))}
+      </datalist>
+
+      <datalist id="fuente-options">
+        {fuenteOptions.map((option) => (
+          <option key={option} value={option} />
+        ))}
+      </datalist>
+
+      <div className="table-cnt-overflow-x">
+        <Table id='diagnosticoTable' className="table-w-100">
+          <TableHeader>
+            <TableRow>
+            <TableHead className="w-8" />
             <TableHead className={`w-12`}>
               <Checkbox
                 aria-label="Seleccionar todas las filas"
@@ -249,7 +348,20 @@ export default function Datos() {
               />
             </TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal break-words`}><b className='px-3 text-medium'>Cliente</b></TableHead>
-            <TableHead className={`min-w-[320px] whitespace-normal break-words`}><b className='text-medium'>Comentario</b></TableHead>
+            <TableHead className={`min-w-[160px] whitespace-normal break-words`}><b className='text-medium'>Canal</b></TableHead>
+            <TableHead className={`min-w-[200px] whitespace-normal break-words`}>
+              <button
+                type="button"
+                onClick={() => toggleSort('squad')}
+                className="gap-1 px-3"
+              >
+                <b className='text-medium'>Squad</b>
+                <span aria-hidden="true" className="text-xs px-2">
+                  {renderSortIndicator('squad')}
+                </span>
+              </button>
+            </TableHead>
+            <TableHead className={`min-w-[220px] whitespace-normal break-words`}><b className='text-medium'>Fuente</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal break-words`}>
               <button
                 type="button"
@@ -262,7 +374,6 @@ export default function Datos() {
                 </span>
               </button>
             </TableHead>
-            <TableHead className={`min-w-[320px] whitespace-normal break-words text-destructive`}><b className='text-medium'>Dolor</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Recurrencia</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Criticidad</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Prioridad</b></TableHead>
@@ -290,135 +401,201 @@ export default function Datos() {
                 </span>
               </button>
             </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {visibleRows.length === 0 && (
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {visibleRows.length === 0 && (
             <TableRow>
-              <TableCell colSpan={10} className="text-destructive text-center">
+              <TableCell colSpan={12} className="text-destructive text-center">
                 No se encontraron filas que coincidan con “{query.trim()}”.
               </TableCell>
             </TableRow>
           )}
-          {visibleRows.map((row) => (
-            <TableRow key={row.id} data-state={selected[row.id] ? 'selected' : undefined}>
-              <TableCell>
-                <Checkbox
-                  aria-label={`Seleccionar fila ${row.id}`}
-                  checked={!!selected[row.id]}
-                  onCheckedChange={(value) => toggleRow(row.id, Boolean(value))}
-                />
-              </TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">{row.cliente}</TableCell>
-              <TableCell className="min-w-[320px] whitespace-normal break-words px-cell">{row.comentario}</TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
-                <Select
-                  value={row.driver || ''}
-                  onValueChange={(value) => handleChangeDriver(row.id, value)}
-                  disabled={drivers.length === 0}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue
-                      placeholder={
-                        drivers.length === 0
-                          ? 'Configurar drivers en la otra pestaña'
-                          : 'Sin completar'
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {drivers.map((driver) => (
-                      <SelectItem key={driver.id ?? driver.name} value={driver.name}>
-                        {driver.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </TableCell>
-              <TableCell className="min-w-[320px] whitespace-normal break-words px-cell text-destructive">{row.dolor}</TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
-                <Select
-                  value={row.recurrencia || ''}
-                  onValueChange={(value) => handleChangeRecurrencia(row.id, value)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Sin asignar" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {RECURRENCIA_OPTIONS.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
-                <Select
-                  value={row.criticidad || ''}
-                  onValueChange={(value) => handleChangeCriticidad(row.id, value)}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Sin asignar" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CRITICIDAD_OPTIONS.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell text-medium"><b>{row.prioridad}</b></TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
-                <Select
-                  value={row.proyecto || ''}
-                  onValueChange={(value) => handleChangeProyecto(row.id, value)}
-                  disabled={projects.length === 0}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue
-                      placeholder={
-                        projects.length === 0 ? 'Configurar proyectos en la otra pestaña' : 'Sin completar'
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {projects.map((project) => (
-                      <SelectItem key={project.id ?? project.name} value={project.name}>
-                        {project.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </TableCell>
-              <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
-                <Select
-                  value={row.estado || ''}
-                  onValueChange={(value) => handleChangeEstado(row.id, value)}
-                  disabled={statuses.length === 0}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue
-                      placeholder={
-                        statuses.length === 0 ? 'Configurar estados en la otra pestaña' : 'Sin completar'
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {statuses.map((status) => (
-                      <SelectItem key={status.id ?? status.name} value={status.name}>
-                        {status.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </TableCell>
-            </TableRow>
+            {visibleRows.map((row) => (
+            <Fragment key={row.id}>
+              <TableRow data-state={selected[row.id] ? 'selected' : undefined}>
+                <TableCell>
+                  <button
+                    type="button"
+                    onClick={() => toggleRowExpanded(row.id)}
+                    aria-label={expandedRows[row.id] ? 'Contraer fila' : 'Expandir fila'}
+                    className="text-xs px-4"
+                  >
+                    {expandedRows[row.id] ? ' ▾ ' : ' ▸ '}
+                  </button>
+                </TableCell>
+                <TableCell>
+                  <Checkbox
+                    aria-label={`Seleccionar fila ${row.id}`}
+                    checked={!!selected[row.id]}
+                    onCheckedChange={(value) => toggleRow(row.id, Boolean(value))}
+                  />
+                </TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                  <Input
+                    type="text"
+                    value={row.cliente}
+                    onChange={(event) => handleChangeCliente(row.id, event.target.value)}
+                    list="cliente-options"
+                    placeholder="Ej: Renta Alta, PYME PES..."
+                  />
+                </TableCell>
+                <TableCell className="min-w-[160px] whitespace-normal break-words px-cell">
+                  <Input
+                    type="text"
+                    value={row.canal}
+                    onChange={(event) => handleChangeCanal(row.id, event.target.value)}
+                    list="canal-options"
+                    placeholder="Ej: ONB, OFB, App..."
+                  />
+                </TableCell>
+                <TableCell className="min-w-[200px] whitespace-normal break-words px-cell">
+                  <Input
+                    type="text"
+                    value={row.squad}
+                    onChange={(event) => handleChangeSquad(row.id, event.target.value)}
+                    list="squad-options"
+                    placeholder="Ej: Custodia, FIMA..."
+                  />
+                </TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                  <Input
+                    type="text"
+                    value={row.fuente}
+                    onChange={(event) => handleChangeFuente(row.id, event.target.value)}
+                    list="fuente-options"
+                    placeholder="Ej: Entrevistas, Hotjar..."
+                  />
+                </TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                  <Select
+                    value={row.driver || ''}
+                    onValueChange={(value) => handleChangeDriver(row.id, value)}
+                    disabled={drivers.length === 0}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        placeholder={
+                          drivers.length === 0
+                            ? 'Configurar drivers en la otra pestaña'
+                            : 'Sin completar'
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {drivers.map((driver) => (
+                        <SelectItem key={driver.id ?? driver.name} value={driver.name}>
+                          {driver.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                  <Select
+                    value={row.recurrencia || ''}
+                    onValueChange={(value) => handleChangeRecurrencia(row.id, value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Sin asignar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {RECURRENCIA_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                  <Select
+                    value={row.criticidad || ''}
+                    onValueChange={(value) => handleChangeCriticidad(row.id, value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Sin asignar" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CRITICIDAD_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell text-medium"><b>{row.prioridad}</b></TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                  <Select
+                    value={row.proyecto || ''}
+                    onValueChange={(value) => handleChangeProyecto(row.id, value)}
+                    disabled={projects.length === 0}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        placeholder={
+                          projects.length === 0 ? 'Configurar proyectos en la otra pestaña' : 'Sin completar'
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projects.map((project) => (
+                        <SelectItem key={project.id ?? project.name} value={project.name}>
+                          {project.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                  <Select
+                    value={row.estado || ''}
+                    onValueChange={(value) => handleChangeEstado(row.id, value)}
+                    disabled={statuses.length === 0}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        placeholder={
+                          statuses.length === 0 ? 'Configurar estados en la otra pestaña' : 'Sin completar'
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {statuses.map((status) => (
+                        <SelectItem key={status.id ?? status.name} value={status.name}>
+                          {status.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+              </TableRow>
+              {expandedRows[row.id] && (
+                <TableRow>
+                  <TableCell colSpan={12} className="px-8 py-4">
+                    <div className="space-y-4 p-6">
+                      <div>
+                        <p className="text-xs"><b>Comentario:</b></p>
+                        <p className="text-sm whitespace-pre-wrap">
+                          {row.comentario || 'Sin comentario registrado.'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs"><b>Dolor:</b></p>
+                        <p className="text-sm whitespace-pre-wrap text-destructive">
+                          {row.dolor || 'Sin dolor registrado.'}
+                        </p>
+                      </div>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </Fragment>
           ))}
-        </TableBody>
-      </Table>
+          </TableBody>
+        </Table>
+      </div>
     </section>
   );
 }

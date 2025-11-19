@@ -16,7 +16,7 @@ export default function DesignCollabRadar({ data, className }: DesignCollabRadar
   if (!data.length) {
     return (
       <div className={className}>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted">
           No hay datos de proyectos para mostrar el radar.
         </p>
       </div>
