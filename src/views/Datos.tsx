@@ -22,7 +22,7 @@ const CLIENTE_OPTIONS = [
   'AGRO GRANDES',
   'EMPRESAS',
 ] as const;
-const RECURRENCIA_OPTIONS = ['Alta', 'Media', 'Baja'] as const;
+const RECURRENCIA_OPTIONS = ['Alta', 'Media', 'Baja', 'Desconocida'] as const;
 const CRITICIDAD_OPTIONS = ['Alta', 'Media', 'Baja'] as const;
 const CANAL_OPTIONS = ['ONB', 'OFB', 'App', 'App Mayo'] as const;
 const SQUAD_OPTIONS = ['Custodia', 'Cambios y GSEC ', 'FIMA', 'Títulos', 'Dinero'] as const;
@@ -366,7 +366,6 @@ export default function Datos() {
                 onCheckedChange={(value) => toggleAll(value === true)}
               />
             </TableHead>
-            <TableHead className={`min-w-[220px] whitespace-normal break-words`}><b className='px-3 text-medium'>Cliente</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal break-words`}>
               <button
                 type="button"
@@ -376,6 +375,18 @@ export default function Datos() {
                 <b className='text-medium'>Productos</b>
                 <span aria-hidden="true" className="text-xs px-2">
                   {renderSortIndicator('producto')}
+                </span>
+              </button>
+            </TableHead>
+            <TableHead className={`min-w-[220px] whitespace-normal break-words`}>
+              <button
+                type="button"
+                onClick={() => toggleSort('proyecto')}
+                className="gap-1 px-3"
+              >
+                <b className='text-medium'>Proyecto</b>
+                <span aria-hidden="true" className="text-xs px-2">
+                  {renderSortIndicator('proyecto')}
                 </span>
               </button>
             </TableHead>
@@ -407,19 +418,8 @@ export default function Datos() {
             </TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Recurrencia</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Criticidad</b></TableHead>
+            <TableHead className={`min-w-[220px] whitespace-normal break-words`}><b className='px-3 text-medium'>Cliente</b></TableHead>            
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Prioridad</b></TableHead>
-            <TableHead className={`min-w-[220px] whitespace-normal break-words`}>
-              <button
-                type="button"
-                onClick={() => toggleSort('proyecto')}
-                className="gap-1 px-3"
-              >
-                <b className='text-medium'>Proyecto</b>
-                <span aria-hidden="true" className="text-xs px-2">
-                  {renderSortIndicator('proyecto')}
-                </span>
-              </button>
-            </TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal break-words`}>
               <button
                 type="button"
@@ -463,15 +463,6 @@ export default function Datos() {
                   />
                 </TableCell>
                 <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
-                  <Input
-                    type="text"
-                    value={row.cliente}
-                    onChange={(event) => handleChangeCliente(row.id, event.target.value)}
-                    list="cliente-options"
-                    placeholder="Ej: Renta Alta, PYME PES..."
-                  />
-                </TableCell>
-                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
                   <Select
                     value={row.producto || ''}
                     onValueChange={(value) => handleChangeProducto(row.id, value)}
@@ -495,6 +486,28 @@ export default function Datos() {
                     </SelectContent>
                   </Select>
                 </TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                  <Select
+                    value={row.proyecto || ''}
+                    onValueChange={(value) => handleChangeProyecto(row.id, value)}
+                    disabled={projects.length === 0}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue
+                        placeholder={
+                          projects.length === 0 ? 'Configurar proyectos en la otra pestaña' : 'Sin completar'
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {projects.map((project) => (
+                        <SelectItem key={project.id ?? project.name} value={project.name}>
+                          {project.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>                
                 <TableCell className="min-w-[160px] whitespace-normal break-words px-cell">
                   <Input
                     type="text"
@@ -580,29 +593,16 @@ export default function Datos() {
                     </SelectContent>
                   </Select>
                 </TableCell>
-                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell text-medium"><b>{row.prioridad}</b></TableCell>
                 <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
-                  <Select
-                    value={row.proyecto || ''}
-                    onValueChange={(value) => handleChangeProyecto(row.id, value)}
-                    disabled={projects.length === 0}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue
-                        placeholder={
-                          projects.length === 0 ? 'Configurar proyectos en la otra pestaña' : 'Sin completar'
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {projects.map((project) => (
-                        <SelectItem key={project.id ?? project.name} value={project.name}>
-                          {project.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </TableCell>
+                  <Input
+                    type="text"
+                    value={row.cliente}
+                    onChange={(event) => handleChangeCliente(row.id, event.target.value)}
+                    list="cliente-options"
+                    placeholder="Ej: Renta Alta, PYME PES..."
+                  />
+                </TableCell>                
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell text-medium"><b>{row.prioridad}</b></TableCell>
                 <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
                   <Select
                     value={row.estado || ''}
