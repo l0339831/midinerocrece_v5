@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 export type TeamProjectsData = {
   name: string;
   count: number;
+  criticidad: number;
 };
 
 export type DesignCollabRadarProps = {
@@ -24,14 +25,16 @@ export default function DesignCollabRadar({ data, className }: DesignCollabRadar
   }
 
   const maxCount = data.reduce((max, item) => Math.max(max, item.count), 0);
-  const radarMax = Math.max(5, maxCount + 1);
+  const maxCrit = data.reduce((max, item) => Math.max(max, item.criticidad), 0);
+  const radarMax = Math.max(5, maxCount + 1, maxCrit);
 
   const indicators = data.map((item) => ({
     name: item.name,
     max: radarMax,
   }));
 
-  const values = data.map((item) => item.count);
+  const projectValues = data.map((item) => item.count);
+  const criticidadValues = data.map((item) => item.criticidad);
 
   const option = {
     title: {
@@ -45,27 +48,32 @@ export default function DesignCollabRadar({ data, className }: DesignCollabRadar
       trigger: 'item',
     },
     legend: {
-      show: false,
+      show: true,
+      bottom: 0,
+      data: ['Total proyectos', 'Criticidad en el negocio'],
     },
     radar: {
+      shape: 'circle',
       indicator: indicators,
       splitNumber: 5,
     },
+    color: ['#426049','#FF671F'],
     series: [
       {
-        name: 'Proyectos',
+        name: '',
         type: 'radar',
         data: [
           {
-            value: values,
-            name: 'Proyectos',
+            value: projectValues,
+            name: 'Total proyectos',
+          },
+          {
+            value: criticidadValues,
+            name: 'Criticidad en el negocio',
           },
         ],
-        areaStyle: {
-          opacity: 0.2,
-        },
         lineStyle: {
-          width: 2,
+          width: 3,
         },
         symbol: 'circle',
         symbolSize: 4,
@@ -77,10 +85,10 @@ export default function DesignCollabRadar({ data, className }: DesignCollabRadar
     <Card className="h-full">
       <CardHeader>
         <CardTitle>Impacto en la Tribu</CardTitle>
-        <p className="text-xs text-muted badge">Proyectos</p>
+        <p className="text-xs text-muted">¿En dónde está la criticidad de los proyectos?</p>
       </CardHeader>
       <CardContent className="flex items-center justify-center h-[420px] w-full">
-      <ReactECharts option={option} style={{ width: '100%', height: '350px' }} />
+      <ReactECharts option={option} style={{ width: '100%', height: '400px' }} />
       </CardContent>
     </Card>
   );

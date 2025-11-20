@@ -323,12 +323,11 @@ export default function App() {
   };
 
   const squads: TeamProjectsData[] = [
-    { name: 'Custodia', count: 5},
-    { name: 'Plazo Fijo', count: 3 },
-    { name: 'G Securities', count: 1 },
-    { name: 'FIMA', count: 4 },
-    { name: 'Títulos', count: 2 },
-    { name: 'Dinero', count: 1 },
+    { name: 'Custodia', count: 5, criticidad: 6 },
+    { name: 'GSEC', count: 1, criticidad: 1 },
+    { name: 'FIMA', count: 1, criticidad: 6 },
+    { name: 'Títulos', count: 4, criticidad: 3 },
+    { name: 'Dinero', count: 1, criticidad: 0 },
   ];  
 
   return (

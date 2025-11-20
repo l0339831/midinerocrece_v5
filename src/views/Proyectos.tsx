@@ -10,6 +10,7 @@ const levelPalette = [
   { depth: 1, color: '#b3cde3' },
   { depth: 2, color: '#ccebc5' },
   { depth: 3, color: '#decbe4' },
+  { depth: 4, color: '#fed9a6' },
 ];
 
 function normalize(value: string | undefined | null): string {
@@ -27,21 +28,24 @@ export default function Proyectos() {
     rows.forEach((row) => {
       const driver = normalize(row.driver);
       const prioridad = normalize(row.prioridad);
+      const urgente = normalize(row.urgente);
       const proyecto = normalize(row.proyecto);
       const estado = normalize(row.estado);
 
       const steps: [string, number][] = [
         [driver, 0],
         [prioridad, 1],
-        [proyecto, 2],
-        [estado, 3],
+        [urgente, 2],
+        [proyecto, 3],
+        [estado, 4],
       ];
 
       steps.forEach(([name]) => nodeSet.add(name));
 
       const pairs: [string, string][] = [
         [driver, prioridad],
-        [prioridad, proyecto],
+        [prioridad, urgente],
+        [urgente, proyecto],
         [proyecto, estado],
       ];
 
