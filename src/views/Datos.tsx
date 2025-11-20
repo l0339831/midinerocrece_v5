@@ -24,6 +24,7 @@ const CLIENTE_OPTIONS = [
 ] as const;
 const RECURRENCIA_OPTIONS = ['Alta', 'Media', 'Baja', 'Desconocida'] as const;
 const CRITICIDAD_OPTIONS = ['Alta', 'Media', 'Baja'] as const;
+const FACTIBILIDAD_OPTIONS = ['Alta', 'Media', 'Baja', 'Desconocida'] as const;
 const CANAL_OPTIONS = ['ONB', 'OFB', 'App', 'App Mayo'] as const;
 const SQUAD_OPTIONS = ['Custodia', 'Cambios y GSEC ', 'FIMA', 'Títulos', 'Dinero'] as const;
 const BASE_FUENTES = [
@@ -170,6 +171,7 @@ export default function Datos() {
         row.recurrencia,
         row.criticidad,
         row.prioridad,
+        row.factibilidad,
         row.proyecto,
         row.estado,
       ]
@@ -277,6 +279,12 @@ export default function Datos() {
   const handleChangeRecurrencia = (rowId: string, newRecurrencia: string) => {
     setRows((prev) =>
       prev.map((row) => (row.id === rowId ? { ...row, recurrencia: newRecurrencia } : row))
+    );
+  };
+
+  const handleChangeFactibilidad = (rowId: string, newFactibilidad: string) => {
+    setRows((prev) =>
+      prev.map((row) => (row.id === rowId ? { ...row, factibilidad: newFactibilidad } : row))
     );
   };
 
@@ -420,6 +428,7 @@ export default function Datos() {
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Criticidad</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal break-words`}><b className='px-3 text-medium'>Cliente</b></TableHead>            
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Prioridad</b></TableHead>
+            <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Factibilidad</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal break-words`}>
               <button
                 type="button"
@@ -437,7 +446,7 @@ export default function Datos() {
           <TableBody>
             {visibleRows.length === 0 && (
             <TableRow>
-              <TableCell colSpan={13} className="text-destructive text-center">
+              <TableCell colSpan={14} className="text-destructive text-center">
                 No se encontraron filas que coincidan con “{query.trim()}”.
               </TableCell>
             </TableRow>
@@ -617,6 +626,23 @@ export default function Datos() {
                 <TableCell className="min-w-[220px] whitespace-normal break-words px-cell text-medium"><b>{row.prioridad}</b></TableCell>
                 <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
                   <Select
+                    value={row.factibilidad || ''}
+                    onValueChange={(value) => handleChangeFactibilidad(row.id, value)}
+                  >
+                    <SelectTrigger className="w-full h-10 text-xs">
+                      <SelectValue placeholder="Sin asignar" />
+                    </SelectTrigger>
+                    <SelectContent className="text-xs p-0 max-h-60 overflow-y-auto border border-input bg-background">
+                      {FACTIBILIDAD_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option} className="text-xs px-3 py-1">
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
+                <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
+                  <Select
                     value={row.estado || ''}
                     onValueChange={(value) => handleChangeEstado(row.id, value)}
                     disabled={statuses.length === 0}
@@ -644,7 +670,7 @@ export default function Datos() {
               </TableRow>
               {expandedRows[row.id] && (
                 <TableRow>
-                  <TableCell colSpan={13} className="px-8 py-4">
+                  <TableCell colSpan={14} className="px-8 py-4">
                     <div className="space-y-4 p-6 table-details-bg">
                       <div>
                         <p className="text-xs whitespace-pre-wrap"><b>💬 Comentario: </b>

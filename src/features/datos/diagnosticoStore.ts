@@ -15,6 +15,7 @@ export type DatosRow = {
   recurrencia: string;
   criticidad: string;
   prioridad: string;
+  factibilidad: string;
   proyecto: string;
   estado: string;
 };
@@ -34,6 +35,7 @@ export const SAMPLE_ROWS: DatosRow[] = [
     recurrencia: 'Alta',
     criticidad: 'Media',
     prioridad: 'Media',
+    factibilidad: '',
     proyecto: 'Análisis App inversiones',
     estado: 'En desarrollo',
   },
@@ -51,6 +53,7 @@ export const SAMPLE_ROWS: DatosRow[] = [
     recurrencia: 'Baja',
     criticidad: 'Alta',
     prioridad: 'Alta',
+    factibilidad: '',
     proyecto: 'Carga CSV regional',
     estado: 'En Backlog de tribu',
   },
@@ -68,6 +71,7 @@ export const SAMPLE_ROWS: DatosRow[] = [
     recurrencia: 'Alta',
     criticidad: 'Media',
     prioridad: 'Media',
+    factibilidad: '',
     proyecto: 'Desbloqueo workflow CX',
     estado: 'Se hizo EQC',
   },
