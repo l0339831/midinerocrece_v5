@@ -25,6 +25,7 @@ const CLIENTE_OPTIONS = [
 const RECURRENCIA_OPTIONS = ['Alta', 'Media', 'Baja', 'Desconocida'] as const;
 const CRITICIDAD_OPTIONS = ['Alta', 'Media', 'Baja'] as const;
 const FACTIBILIDAD_OPTIONS = ['Alta', 'Media', 'Baja', 'Desconocida'] as const;
+const URGENTE_OPTIONS = ['Si', 'No'] as const;
 const CANAL_OPTIONS = ['ONB', 'OFB', 'App', 'App Mayo'] as const;
 const SQUAD_OPTIONS = ['Custodia', 'Cambios y GSEC ', 'FIMA', 'Títulos', 'Dinero'] as const;
 const BASE_FUENTES = [
@@ -171,6 +172,7 @@ export default function Datos() {
         row.recurrencia,
         row.criticidad,
         row.prioridad,
+        row.urgente,
         row.factibilidad,
         row.proyecto,
         row.estado,
@@ -279,6 +281,12 @@ export default function Datos() {
   const handleChangeRecurrencia = (rowId: string, newRecurrencia: string) => {
     setRows((prev) =>
       prev.map((row) => (row.id === rowId ? { ...row, recurrencia: newRecurrencia } : row))
+    );
+  };
+
+  const handleChangeUrgente = (rowId: string, newUrgente: string) => {
+    setRows((prev) =>
+      prev.map((row) => (row.id === rowId ? { ...row, urgente: newUrgente } : row))
     );
   };
 
@@ -428,6 +436,7 @@ export default function Datos() {
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Criticidad</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal break-words`}><b className='px-3 text-medium'>Cliente</b></TableHead>            
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Prioridad</b></TableHead>
+            <TableHead className={`min-w-[160px] whitespace-normal`}><b className='px-3 text-medium'>Urgente</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal`}><b className='px-3 text-medium'>Factibilidad</b></TableHead>
             <TableHead className={`min-w-[220px] whitespace-normal break-words`}>
               <button
@@ -446,7 +455,7 @@ export default function Datos() {
           <TableBody>
             {visibleRows.length === 0 && (
             <TableRow>
-              <TableCell colSpan={14} className="text-destructive text-center">
+              <TableCell colSpan={15} className="text-destructive text-center">
                 No se encontraron filas que coincidan con “{query.trim()}”.
               </TableCell>
             </TableRow>
@@ -624,6 +633,23 @@ export default function Datos() {
                   />
                 </TableCell>                
                 <TableCell className="min-w-[220px] whitespace-normal break-words px-cell text-medium"><b>{row.prioridad}</b></TableCell>
+                <TableCell className="min-w-[160px] whitespace-normal break-words px-cell">
+                  <Select
+                    value={row.urgente || ''}
+                    onValueChange={(value) => handleChangeUrgente(row.id, value)}
+                  >
+                    <SelectTrigger className="w-full h-10 text-xs">
+                      <SelectValue placeholder="Sin asignar" />
+                    </SelectTrigger>
+                    <SelectContent className="text-xs p-0 max-h-60 overflow-y-auto border border-input bg-background">
+                      {URGENTE_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option} className="text-xs px-3 py-1">
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </TableCell>
                 <TableCell className="min-w-[220px] whitespace-normal break-words px-cell">
                   <Select
                     value={row.factibilidad || ''}
@@ -670,7 +696,7 @@ export default function Datos() {
               </TableRow>
               {expandedRows[row.id] && (
                 <TableRow>
-                  <TableCell colSpan={14} className="px-8 py-4">
+                  <TableCell colSpan={15} className="px-8 py-4">
                     <div className="space-y-4 p-6 table-details-bg">
                       <div>
                         <p className="text-xs whitespace-pre-wrap"><b>💬 Comentario: </b>
