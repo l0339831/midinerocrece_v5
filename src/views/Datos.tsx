@@ -468,7 +468,7 @@ export default function Datos() {
                     onValueChange={(value) => handleChangeProducto(row.id, value)}
                     disabled={products.length === 0}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full h-10 text-xs">
                       <SelectValue
                         placeholder={
                           products.length === 0
@@ -477,9 +477,13 @@ export default function Datos() {
                         }
                       />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="text-xs p-0 max-h-60 overflow-y-auto border border-input bg-background">
                       {products.map((product) => (
-                        <SelectItem key={product.id ?? product.name} value={product.name}>
+                        <SelectItem
+                          key={product.id ?? product.name}
+                          value={product.name}
+                          className="text-xs px-3 py-1"
+                        >
                           {product.name}
                         </SelectItem>
                       ))}
@@ -492,16 +496,20 @@ export default function Datos() {
                     onValueChange={(value) => handleChangeProyecto(row.id, value)}
                     disabled={projects.length === 0}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full h-10 text-xs">
                       <SelectValue
                         placeholder={
                           projects.length === 0 ? 'Configurar proyectos en la otra pestaña' : 'Sin completar'
                         }
                       />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="text-xs p-0 max-h-60 overflow-y-auto border border-input bg-background">
                       {projects.map((project) => (
-                        <SelectItem key={project.id ?? project.name} value={project.name}>
+                        <SelectItem
+                          key={project.id ?? project.name}
+                          value={project.name}
+                          className="text-xs px-3 py-1"
+                        >
                           {project.name}
                         </SelectItem>
                       ))}
@@ -541,7 +549,7 @@ export default function Datos() {
                     onValueChange={(value) => handleChangeDriver(row.id, value)}
                     disabled={drivers.length === 0}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full h-10 text-xs">
                       <SelectValue
                         placeholder={
                           drivers.length === 0
@@ -550,9 +558,13 @@ export default function Datos() {
                         }
                       />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="text-xs p-0 max-h-60 overflow-y-auto border border-input bg-background">
                       {drivers.map((driver) => (
-                        <SelectItem key={driver.id ?? driver.name} value={driver.name}>
+                        <SelectItem
+                          key={driver.id ?? driver.name}
+                          value={driver.name}
+                          className="text-xs px-3 py-1"
+                        >
                           {driver.name}
                         </SelectItem>
                       ))}
@@ -564,12 +576,12 @@ export default function Datos() {
                     value={row.recurrencia || ''}
                     onValueChange={(value) => handleChangeRecurrencia(row.id, value)}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full h-10 text-xs">
                       <SelectValue placeholder="Sin asignar" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="text-xs p-0 max-h-60 overflow-y-auto border border-input bg-background">
                       {RECURRENCIA_OPTIONS.map((option) => (
-                        <SelectItem key={option} value={option}>
+                        <SelectItem key={option} value={option} className="text-xs px-3 py-1">
                           {option}
                         </SelectItem>
                       ))}
@@ -581,12 +593,12 @@ export default function Datos() {
                     value={row.criticidad || ''}
                     onValueChange={(value) => handleChangeCriticidad(row.id, value)}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full h-10 text-xs">
                       <SelectValue placeholder="Sin asignar" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="text-xs p-0 max-h-60 overflow-y-auto border border-input bg-background">
                       {CRITICIDAD_OPTIONS.map((option) => (
-                        <SelectItem key={option} value={option}>
+                        <SelectItem key={option} value={option} className="text-xs px-3 py-1">
                           {option}
                         </SelectItem>
                       ))}
@@ -609,16 +621,20 @@ export default function Datos() {
                     onValueChange={(value) => handleChangeEstado(row.id, value)}
                     disabled={statuses.length === 0}
                   >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full h-10 text-xs">
                       <SelectValue
                         placeholder={
                           statuses.length === 0 ? 'Configurar estados en la otra pestaña' : 'Sin completar'
                         }
                       />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="text-xs p-0 max-h-60 overflow-y-auto border border-input bg-background">
                       {statuses.map((status) => (
-                        <SelectItem key={status.id ?? status.name} value={status.name}>
+                        <SelectItem
+                          key={status.id ?? status.name}
+                          value={status.name}
+                          className="text-xs px-3 py-1"
+                        >
                           {status.name}
                         </SelectItem>
                       ))}
