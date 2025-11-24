@@ -11,7 +11,7 @@ import { Home, BarChart3, Sparkles, Upload, FileText, type LucideIcon } from 'lu
 import Datos from "./views/Datos";
 import Proyectos from "./views/Proyectos";
 import DesignCollabRadar, { TeamProjectsData } from "./viz/DesignCollabRadar";
-
+import CSATCommentsPanel from '@/features/csat/CSATCommentsPanel';
 
 type ViewKey = 'home' | 'datos' | 'proyectos' | 'exportar';
 
@@ -323,11 +323,12 @@ export default function App() {
   };
 
   const squads: TeamProjectsData[] = [
-    { name: 'Custodia', count: 5, criticidad: 6 },
-    { name: 'GSEC', count: 1, criticidad: 1 },
-    { name: 'FIMA', count: 1, criticidad: 6 },
-    { name: 'Títulos', count: 4, criticidad: 3 },
-    { name: 'Dinero', count: 1, criticidad: 0 },
+    { name: 'Custodia', count: 5, criticidad: 3 },
+    { name: 'Plazo Fijo', count: 3, criticidad: 3 },
+    { name: 'G Securities', count: 1, criticidad: 4 },
+    { name: 'FIMA', count: 4, criticidad: 5 },
+    { name: 'Títulos', count: 2, criticidad: 4 },
+    { name: 'Dinero', count: 1, criticidad: 2 },
   ];  
 
   return (
@@ -341,7 +342,6 @@ export default function App() {
           {view === 'home' && (
             <>
               <KPIBoard />
-
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 {/* Columna izquierda (2/3): CSAT + Sentiment + Breakdown */}
                 <div className="lg:col-span-2 space-y-6">
@@ -358,11 +358,10 @@ export default function App() {
                   <DesignCollabRadar data={squads} />
                 </div>
               </div>
+
+              <CSATCommentsPanel />
             </>
           )}
-
-
-
           {view === 'datos' && (
             <Tabs defaultValue="diagnostico" className="space-y-4">
               <TabsList>
